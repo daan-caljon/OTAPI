@@ -2,5 +2,4 @@ figures/*
 data/*
 models/*
 __pycache__/
-*.pyc
-*.pyo
+*.py[cod]
