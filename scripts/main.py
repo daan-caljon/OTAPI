@@ -15,8 +15,8 @@ import yaml
 import src.methods.allocation.Extra_experiments as extra
 
 #Set parameters for the simulation
-num_nodes = 5000 #does nothing when dataset is BC or Flickr
-dataset = "full_sim" #BC, Flickr, full_sim
+num_nodes = 500 #does nothing when dataset is BC or Flickr
+dataset = "Flickr" #BC, Flickr, full_sim
 T = int(0.05*num_nodes)
 #number of treated nodes
 do_greedy =  True 
@@ -26,8 +26,8 @@ do_CFR = True #TARnet (alpha = 0)
 do_CFR_heuristic = False  #combine degree and uplift heuristic
 do_random = True
 do_greedy_simulated = True
-do_full = False #turn this to true if going over all budgets
-do_only_allocations = False #if true, the data generation and training step are skipped
+do_full = True #turn this to true if going over all budgets
+do_only_allocations = True #if true, the data generation and training step are skipped
 do_only_graphs = False #if true allocations are skipped
 get_degree_distribution = True #if true, degree distribution is plotted
 get_TTE_curve_total = False #if true, TTE curve is plotted for different NT2O values
@@ -73,7 +73,7 @@ if not do_only_allocations:
     #Hyperparameter tuning for each dataset
     """-------------------MODEL TRAINING-------------------"""
     config_netest, val_loss_netest, config_CFR, val_loss_CFR =  run_experiment.train_best_models(dataset = dataset,setting = setting)
-    directory = "Results/" + setting + "/"
+    directory = "models/" + setting + "/"
     if not os.path.exists(directory):
         os.makedirs(directory)
 

@@ -117,7 +117,7 @@ def run_allocations(dataset,T,do_GA,do_CELF,do_CFR,do_CFR_heuristic,do_greedy,do
         treatment_amount_list.extend(list(range(150,T,50)))
         treatment_amount_list.append(T)
         if dataset == "Flickr":
-            treatment_amount_list.extend(118) #to get the 5% of nodes
+            treatment_amount_list.extend([118,472,943]) #to get the 5,10, 20% of nodes
 
     single_discount_solution_dict = single_discount(data_params,testX,T,testA,POTest,model_netest)
     single_discount_solution_dict[testA.shape[0]] = [torch.ones(testA.shape[0], dtype=torch.float32),all_treated_predicted,all_treated_outcome]

@@ -1,4 +1,4 @@
 figures/*
 data/*
 models/*
-
+__pycache__/
