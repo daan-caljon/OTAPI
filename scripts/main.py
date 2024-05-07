@@ -15,8 +15,8 @@ import yaml
 import src.methods.allocation.Extra_experiments as extra
 
 #Set parameters for the simulation
-num_nodes = 500 #does nothing when dataset is BC or Flickr
-dataset = "Flickr" #BC, Flickr, full_sim
+num_nodes = 5000 #does nothing when dataset is BC or Flickr
+dataset = "full_sim" #BC, Flickr, full_sim
 T = int(0.05*num_nodes)
 #number of treated nodes
 do_greedy =  True 
@@ -26,13 +26,13 @@ do_CFR = True #TARnet (alpha = 0)
 do_CFR_heuristic = False  #combine degree and uplift heuristic
 do_random = True
 do_greedy_simulated = True
-do_full = True #turn this to true if going over all budgets
+do_full = False #turn this to true if going over all budgets
 do_only_allocations = False #if true, the data generation and training step are skipped
 do_only_graphs = False #if true allocations are skipped
 get_degree_distribution = True #if true, degree distribution is plotted
 get_TTE_curve_total = False #if true, TTE curve is plotted for different NT2O values
 run_extra = False #if true, extra experiments are run
-similarity_k = 118 #k for which the similarity matrix is generated
+similarity_k = 250 #k for which the similarity matrix is generated
 spillover_mag_k = 250 #k for which the effect of beta_spillover is shown
 
 
