@@ -16,14 +16,14 @@ from sklearn.decomposition import LatentDirichletAllocation
 
 def readData(dataset):
     if dataset == "BC":
-        data = sio.loadmat(r"../data/BC/BC0.mat")
-        with open(r'../data/BC/BC_parts.pkl','rb') as f:
+        data = sio.loadmat(r"data/semi_synthetic/BC/BC0.mat")
+        with open(r'data/semi_synthetic/BC/BC_parts.pkl','rb') as f:
             parts = pkl.load(f)
     
     if dataset == "Flickr":
-        print ("Flickr Flickr")
-        data = sio.loadmat(r"../data/Flickr/Flickr01.mat")
-        with open(r'../data/Flickr/Flickr_parts.pkl','rb') as f:
+        print ("Flickr")
+        data = sio.loadmat(r"data/semi_synthetic/Flickr/Flickr01.mat")
+        with open(r'data/semi_synthetic/Flickr/Flickr_parts.pkl','rb') as f:
             parts = pkl.load(f)
             
     return data,parts

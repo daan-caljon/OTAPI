@@ -50,20 +50,9 @@ def run_extra_allocations(dataset,T,do_GA,do_CELF,do_CFR,do_CFR_heuristic,do_gre
     testA, testX, testT,cfTestT,POTest,cfPOTest = utils.dataTransform(dataTest,cuda)
 
     #Load in NetEst model and CFR
-    model_netest_path = "../results/"+dataset+"/model/"+"NetEstimator" + "_"+ setting+".pth"
-    model_CFR_path = "../results/"+dataset+"/model/"+"CFR" + "_"+ setting+".pth"
-    # if dataset ==  "full_sim":
-    #     model_netest_path = "../results/"+dataset+"/model/"+"NetEst" + "_"+ setting+".pth"
-    #     model_CFR_path = "../results/"+dataset+"/model/"+"CFR" + "_"+ setting+".pth"
-    #     model_netest_path =  r"C:\Users\u0165132\OneDrive - KU Leuven\1-PhD\Causal-Inference-on-Networked-Data\results\full_sim\model\model_expID_4_alpha_0.5_gamma_0.5.pth"
-    #     model_CFR_path = r"C:\Users\u0165132\OneDrive - KU Leuven\1-PhD\Causal-Inference-on-Networked-Data\results\full_sim\model\CFR_model_expID_4_alpha_0.5_gamma_0.5.pth"
-    # elif dataset == "BC":
-    #     model_netest_path = r"C:\Users\u0165132\OneDrive - KU Leuven\1-PhD\Causal-Inference-on-Networked-Data\results\BC\model\model_expID_4_alpha_0.5_gamma_0.5.pth"
-    #     model_CFR_path = r"C:\Users\u0165132\OneDrive - KU Leuven\1-PhD\Causal-Inference-on-Networked-Data\results\BC\model\CFR_model_expID_4_alpha_0.5_gamma_0.5.pth"
-    # elif dataset == "Flickr":
-    #     model_netest_path = r"C:\Users\u0165132\OneDrive - KU Leuven\1-PhD\Causal-Inference-on-Networked-Data\results\Flickr\model\model_expID_4_alpha_0.5_gamma_0.5.pth"
-    #     model_CFR_path = r"C:\Users\u0165132\OneDrive - KU Leuven\1-PhD\Causal-Inference-on-Networked-Data\results\Flickr\model\CFR_model_expID_4_alpha_0.5_gamma_0.5.pth"
-
+    model_netest_path = "models/"+setting+"/"+"NetEstimator" + "_"+ setting+".pth"
+    model_CFR_path =  "models/"+setting+"/"+"CFR" + "_"+ setting+".pth"
+    
     model_netest = torch.load(model_netest_path)
     model_CFR = torch.load(model_CFR_path)
     model_netest.eval()
@@ -148,15 +137,11 @@ def run_extra_allocations(dataset,T,do_GA,do_CELF,do_CFR,do_CFR_heuristic,do_gre
 
     #save all dicts:
     #save degree_solution_dict_test
-    my_path = "Results/" + setting + "/"
+    my_path = "data/allocations/" + setting + "/"
     extra = "extra_experiment_"
     path_degree = my_path + extra + "degree_solution_dict_test.pkl"
     with open(path_degree, 'wb') as f:
         pkl.dump(degree_solution_dict, f)
-    #save single_discount_solution_dict_test
-    # single_discount_solution_dict = single_discount(data_params,testX,T,testA,POTest,model_netest)
-    # single_discount_solution_dict[testA.shape[0]] = [torch.ones(testA.shape[0], dtype=torch.float32),all_treated_predicted,all_treated_outcome]
-    # single_discount_solution_dict[0] = [torch.zeros(testA.shape[0], dtype=torch.float32),zero_predicted,zero_actual]
 
     path_single_discount = my_path + extra +"single_discount_solution_dict_test.pkl"
     with open(path_single_discount,"wb") as f:

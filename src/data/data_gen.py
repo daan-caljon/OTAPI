@@ -82,14 +82,16 @@ def potentialOutcomeSimulation(w,X,A,T,beta0, w_beta_T2Y, bias_T2Y,epsilon,betaT
 
 def generate_data(dataset,w_c,w, w_beta_T2Y,beta0, betaConfounding,betaNeighborConfounding, 
                   bias_T2Y,betaTreat2Outcome,betaCovariate2Outcome,betaNeighborCovariate2Outcome,betaNeighborTreatment2Outcome, 
-                  betaNoise,gen_type,nodes = 2000,edges_new_node = 2, covariate_dim = 10,flipRate = 1):
+                  betaNoise,gen_type,nodes = 2000,edges_new_node = 2, covariate_dim = 10,flipRate = 1,watts_strogatz = False):
 
     z_11 = 0.7
     z_22 = 0.2
     if dataset == "full_sim":
-        
-        G = nx.connected_watts_strogatz_graph(nodes, 4, 0.1)
-        print("avg_degre",sum(dict(G.degree()).values()) / len(G))
+        if watts_strogatz:
+            G = nx.connected_watts_strogatz_graph(nodes, 4, 0.1)
+        else:
+            G = nx.barabasi_albert_graph(nodes, edges_new_node)
+        print("avg_degree",sum(dict(G.degree()).values()) / len(G))
         adj_matrix = nx.adjacency_matrix(G)
     else:
         
@@ -230,25 +232,25 @@ def generate_data(dataset,w_c,w, w_beta_T2Y,beta0, betaConfounding,betaNeighborC
 
 def simulate_data(dataset,w_c,w, w_beta_T2Y,beta0, betaConfounding,betaNeighborConfounding, 
                   bias_T2Y,betaTreat2Outcome,betaCovariate2Outcome,betaNeighborCovariate2Outcome,betaNeighborTreatment2Outcome, 
-                  betaNoise, setting,nodes = 2000,edges_new_node = 2, covariate_dim = 10,flipRate = 1):
+                  betaNoise, setting,nodes = 2000,edges_new_node = 2, covariate_dim = 10,flipRate = 1,watts_strogatz = False):
     train =  generate_data(dataset = dataset,w_c = w_c, w= w, w_beta_T2Y=w_beta_T2Y,beta0=beta0, betaConfounding=betaConfounding,
                            betaNeighborConfounding=betaNeighborConfounding,bias_T2Y=bias_T2Y,
                            betaTreat2Outcome=betaTreat2Outcome,betaCovariate2Outcome=betaCovariate2Outcome,
                            betaNeighborCovariate2Outcome=betaNeighborCovariate2Outcome,betaNeighborTreatment2Outcome=betaNeighborTreatment2Outcome, 
                            betaNoise=betaNoise,gen_type = "train",nodes = nodes,edges_new_node = edges_new_node, covariate_dim = covariate_dim,
-                           flipRate = flipRate)
+                           flipRate = flipRate,watts_strogatz=watts_strogatz)
     val = generate_data(dataset,w_c = w_c, w=w,w_beta_T2Y=w_beta_T2Y,beta0=beta0, betaConfounding=betaConfounding,
                             betaNeighborConfounding=betaNeighborConfounding,bias_T2Y=bias_T2Y,
                             betaTreat2Outcome=betaTreat2Outcome,betaCovariate2Outcome=betaCovariate2Outcome,
                             betaNeighborCovariate2Outcome=betaNeighborCovariate2Outcome,betaNeighborTreatment2Outcome=betaNeighborTreatment2Outcome, 
                             betaNoise=betaNoise,gen_type = "val",nodes = nodes,edges_new_node = edges_new_node, covariate_dim = covariate_dim,
-                            flipRate = flipRate)
+                            flipRate = flipRate,watts_strogatz=watts_strogatz)
     test = generate_data(dataset,w_c= w_c,w=w,w_beta_T2Y=w_beta_T2Y,beta0=beta0, betaConfounding=betaConfounding,
                             betaNeighborConfounding=betaNeighborConfounding,bias_T2Y=bias_T2Y,
                             betaTreat2Outcome=betaTreat2Outcome,betaCovariate2Outcome=betaCovariate2Outcome,
                             betaNeighborCovariate2Outcome=betaNeighborCovariate2Outcome,betaNeighborTreatment2Outcome=betaNeighborTreatment2Outcome, 
                             betaNoise=betaNoise,gen_type = "test",nodes = nodes,edges_new_node = edges_new_node, covariate_dim = covariate_dim,
-                            flipRate = flipRate)
+                            flipRate = flipRate,watts_strogatz=watts_strogatz)
     data = {"train":train,"val":val,"test":test}
 
    

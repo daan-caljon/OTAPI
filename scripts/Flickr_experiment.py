@@ -1,3 +1,5 @@
+"""By running this code, Figure 4a, 4c, and Table 5c from the paper can be reproduced. """
+
 import os
 import sys
 DIR = r"C:\Users\u0165132\OneDrive - KU Leuven\1-PhD\Causal-Inference-on-Networked-Data\OTAPI"
@@ -15,25 +17,21 @@ import yaml
 import src.methods.allocation.Extra_experiments as extra
 
 #Set parameters for the simulation
-num_nodes = 500 #does nothing when dataset is BC or Flickr
+num_nodes = 2358 #does nothing when dataset is BC or Flickr
 dataset = "Flickr" #BC, Flickr, full_sim
-T = int(0.05*num_nodes)
-#number of treated nodes
+T = int(0.05*num_nodes) #number of treated nodes
 do_greedy =  True 
 do_GA = True
 do_CELF = True
 do_CFR = True #TARnet (alpha = 0)
-do_CFR_heuristic = False  #combine degree and uplift heuristic
+do_CFR_heuristic = False  #combine degree and uplift heuristic (leave on False)
 do_random = True
 do_greedy_simulated = True
 do_full = True #turn this to true if going over all budgets
-do_only_allocations = True #if true, the data generation and training step are skipped
-do_only_graphs = True #if true allocations are skipped
+do_only_allocations = False #if true, the data generation and training step are skipped
+do_only_graphs = False #if true allocations are skipped
 get_degree_distribution = True #if true, degree distribution is plotted
-get_TTE_curve_total = False #if true, TTE curve is plotted for different NT2O values
-run_extra = False #if true, extra experiments are run
-similarity_k = 250 #k for which the similarity matrix is generated
-spillover_mag_k = 250 #k for which the effect of beta_spillover is shown
+similarity_k = 118 #k for which the similarity matrix is generated (118,472,943)
 
 
 random_seed = 1000 
@@ -108,7 +106,7 @@ if not do_only_graphs:
 """-------------------FIGURE GENERATION-------------------"""
 
 #node list for generating figures
-cutoff = 5
+cutoff = 2
 node_list = [1]
 if not do_full:
 
@@ -136,26 +134,4 @@ get_graphs.get_similarity_matrix(total_nodes=num_nodes,setting = setting,do_gree
 #Show degree distribution:
 if get_degree_distribution:
     get_graphs.get_degree_dist(dataset = dataset,setting = setting)
-
-#This only works for non-greedy methods (GA,CFR,random,degree,SD)
-if run_extra:
-    my_node_list = [500,1000,2000,3000,4000]
-    NT2O_list = [0,0.1,0.3,0.5,0.7]
-    setting_list = []
-    for NT2O in NT2O_list:
-        setting = dataset + "_num_nodes" + str(num_nodes) + "_T2O_" + str(betaTreat2Outcome) + "_NT2O_" + str(NT2O) + "_seed_" + str(random_seed)
-        setting_list.append(setting)
-        extra.run_extra_allocations(dataset = dataset,T = T,do_GA = do_GA,do_CELF = do_CELF,do_CFR = do_CFR,do_CFR_heuristic = do_CFR_heuristic,do_greedy = do_greedy,do_random = do_random,do_greedy_simulated = do_greedy_simulated,
-                                w_c = w_c,w = w,w_beta_T2Y = w_beta_T2Y,beta0 = beta0,bias_T2Y = bias_T2Y,betaTreat2Outcome = betaTreat2Outcome,betaCovariate2Outcome = betaCovariate2Outcome,
-                                betaNeighborCovariate2Outcome = betaNeighborCovariate2Outcome,betaNeighborTreatment2Outcome = NT2O,betaNoise = betaNoise,setting = setting,node_list = my_node_list,do_full = do_full,num_nodes = num_nodes)
-
-
-if get_TTE_curve_total:
-    NT2O_list = [0,0.1,0.3,0.5,0.7]
-    setting_list = []
-    for NT2O in NT2O_list:
-        setting = dataset + "_num_nodes" + str(num_nodes) + "_T2O_" + str(betaTreat2Outcome) + "_NT2O_" + str(NT2O) + "_seed_" + str(random_seed)
-        setting_list.append(setting)
-    get_graphs.get_TTE_curve_total(k =spillover_mag_k,dataset = dataset,setting_list = setting_list,NT2O_list=NT2O_list,do_greedy=do_greedy,
-                                   do_GA=do_GA,do_CELF=do_CELF,do_CFR = do_CFR,do_greedy_simulated=do_greedy_simulated)
 
