@@ -1,4 +1,0 @@
-epochs: 800
-lr: 0.0005
-n_in: 1
-n_out: 1
