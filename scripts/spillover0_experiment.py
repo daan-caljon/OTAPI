@@ -4,7 +4,7 @@ Figures 10i and 10j are generated
 
 import os
 import sys
-DIR = r"C:\Users\u0165132\OneDrive - KU Leuven\1-PhD\Causal-Inference-on-Networked-Data\OTAPI"
+DIR = r""
 os.chdir(DIR)
 sys.path.append(DIR)
 

@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import yaml
 import pandas as pd
 import os
+import utils.utils as utils
 
 def get_TTE(solution_dict,num_nodes):
     TTE= []
@@ -343,35 +344,29 @@ def get_similarity_matrix(total_nodes,setting,do_greedy,do_GA,
 
         with open(my_path + extra +'ga_solution_dict_test.pkl', 'rb') as file:
             ga_solution_dict = pkl.load(file)
-    # print(ga_solution_dict)
+
 
     with open(my_path + extra +'single_discount_solution_dict_test.pkl', 'rb') as file:
-        # Load the data from the .pkl file
         single_discount_solution_dict = pkl.load(file)
-    #print(single_discount_solution_dict)
+
 
     if do_greedy:
         with open(my_path + extra +'greedy_solution_dict_test.pkl', 'rb') as file:
-            # Load the data from the .pkl file
+
             greedy_solution_dict = pkl.load(file)
-        #print(greedy_solution_dict)
+
     with open(my_path + extra +'random_solution_dict_test.pkl', 'rb') as file: 
-        # Load the data from the .pkl file
         random_solution_dict = pkl.load(file)
 
     if do_CFR:
         with open(my_path + extra +'CFR_solution_dict_test.pkl', 'rb') as file: 
-            # Load the data from the .pkl file
             CFR_solution_dict = pkl.load(file)
-    # #celf
     if do_CELF:
         with open(my_path + extra +'celf_solution_dict_test.pkl', 'rb') as file:
             # Load the data from the .pkl file
             celf_solution_dict = pkl.load(file)
-    # # #greedy_simulated
     if do_greedy_simulated:
         with open(my_path + extra +'greedy_simulated_solution_dict_test.pkl', 'rb') as file:
-            # Load the data from the .pkl file
             greedy_simulated_solution_dict = pkl.load(file)
     my_path_results = "data/allocations/" + setting + "/"
     experiment_extra = "extra_experiment_"
@@ -399,17 +394,13 @@ def get_similarity_matrix(total_nodes,setting,do_greedy,do_GA,
 
     degree_T = degree_solution_dict[my_T][0].numpy()
     print(np.sum(degree_T))
-    #print(degree_T[:20])
     single_discount_T = single_discount_solution_dict[my_T][0].numpy()
     print(np.sum(single_discount_T))
-    #print(single_discount_T[:20])
-    #print((degree_T*single_discount_T)[:20])
     random_T = random_solution_dict[my_T][0].numpy()
     if do_greedy:
         greedy_indices = np.array(greedy_solution_dict[my_T][0])
         greedy_T = np.zeros(total_nodes)
         greedy_T[greedy_indices] = 1
-
     if do_GA:
         ga_T = np.array(ga_solution_dict[my_T][0])
     if do_CFR:
@@ -419,14 +410,11 @@ def get_similarity_matrix(total_nodes,setting,do_greedy,do_GA,
         celf_indices = np.array(celf_solution_dict[my_T][0])
         celf_T = np.zeros(total_nodes)
         celf_T[celf_indices] = 1
-
     if do_greedy_simulated:
         greedy_simulated_indices = np.array(greedy_simulated_solution_dict[my_T][0])
         greedy_simulated_T = np.zeros(total_nodes)
         greedy_simulated_T[greedy_simulated_indices] = 1
-    # if do_CFR_heuristic:
-    #     CFR_heuristic_T = CFR_heuristic_solution_dict[i][0]
-    #compare the solutions
+    #By multiplying two solution vectors, we get the number of common selected nodes
     num_methods = 2 + do_greedy + do_GA + do_CFR + do_CELF + do_greedy_simulated
     my_matrix = np.zeros((num_methods,num_methods))
     my_matrix[0,1] = np.sum(degree_T*single_discount_T)/my_T
@@ -434,7 +422,7 @@ def get_similarity_matrix(total_nodes,setting,do_greedy,do_GA,
     if do_greedy:
         j+=1
         greedy_j = j
-        my_matrix[0,greedy_j] = np.sum(degree_T*greedy_T)/my_T
+        my_matrix[0,greedy_j] = np.sum(degree_T*greedy_T)/my_T 
     if do_GA:
         j+=1
         ga_j = j
@@ -520,12 +508,8 @@ def get_degree_dist(dataset,setting):
             import pickle as pkl
             data = pkl.load(f)
     dataTest = data["test"]
-        # trainA, trainX, trainT,cfTrainT,POTrain,cfPOTrain = utils.dataTransform(dataTrain,cuda)
-        # valA, valX, valT,cfValT,POVal,cfPOVal = utils.dataTransform(dataVal,cuda)
-    import utils.utils as utils
     testA, testX, testT,cfTestT,POTest,cfPOTest = utils.dataTransform(dataTest,False)
     def degree_distribution(adj_matrix,setting):
-        import matplotlib.pyplot as plt
         # Calculate the degree of each node
         degrees = np.sum(adj_matrix, axis=1)
         fig_width = 6  # Width of the figure in inches

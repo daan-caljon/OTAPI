@@ -20,6 +20,8 @@ def run_model(dataset,model,epochs,lr,setting, n_in = 1, n_out = 1):
     }
     """
 
+    #To change as little from the original code as possible, we keep parser but use the default values
+
     parser = argparse.ArgumentParser()
     parser.add_argument('--cuda', type=int, default=7,help='Use CUDA training.')
     parser.add_argument('--seed', type=int, default=24, help='Random seed. RIP KOBE')

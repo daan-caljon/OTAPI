@@ -1,10 +1,10 @@
-"""This code runs the allocations for beta_spillover (betaNeighborTreatment2Outcome) = 0
+"""This code runs the allocations for beta_spillover (betaNeighborTreatment2Outcome) = 0.7
 Figures 10a and 10b are generated
 """
 
 import os
 import sys
-DIR = r"C:\Users\u0165132\OneDrive - KU Leuven\1-PhD\Causal-Inference-on-Networked-Data\OTAPI"
+DIR = r""
 os.chdir(DIR)
 sys.path.append(DIR)
 

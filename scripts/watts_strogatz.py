@@ -1,9 +1,9 @@
-"""This code runs the watts strogatz experiment
+"""This code runs the watts strogatz experiment in the appendix
 """
 
 import os
 import sys
-DIR = r"C:\Users\u0165132\OneDrive - KU Leuven\1-PhD\Causal-Inference-on-Networked-Data\OTAPI"
+DIR = r""
 os.chdir(DIR)
 sys.path.append(DIR)
 

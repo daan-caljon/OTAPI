@@ -5,7 +5,16 @@ import scipy.sparse as sp
 
 import torch
 import torch.nn.functional as F
-
+"""
+    This is code from Song Jiang: https://github.com/songjiang0909/Causal-Inference-on-Networked-Data
+    This code was ued in "Estimating causal effects on networked observational data":
+    @inproceedings{netest2022,
+    title={Estimating Causal Effects on Networked Observational Data via Representation Learning},
+    author={Song Jiang, Yizhou Sun},
+    booktitle={Proceedings of the 31st ACM International Conference on Information & Knowledge Management},
+    year={2022}
+    }
+    """
 
 def sparse_mx_to_torch_sparse_tensor(sparse_mx,cuda=False):
     """Convert a scipy sparse matrix to a torch sparse tensor."""
@@ -47,12 +56,7 @@ def load_data(dataset,setting,cuda=True):
     print ("================================Dataset================================")
     print(setting)
     file = "data/simulated/" + setting +".pkl"
-    # if dataset == "BC":
-    #     file = "../data/BC/simulation/"+setting+ ".pkl"#"_expID_"+str(expID)+".pkl"
-    # if dataset == "Flickr":
-    #     file = "../data/Flickr/simulation/"+setting+ ".pkl"#"_expID_"+str(expID)+".pkl"
-    # if dataset == "full_sim":
-    #     file = "../full_simulation/"+setting+".pkl"
+
     with open(file,"rb") as f:
         data = pkl.load(f)
     dataTrain,dataVal,dataTest = data["train"],data["val"],data["test"]

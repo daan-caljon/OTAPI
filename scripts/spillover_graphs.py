@@ -6,7 +6,7 @@ To get the graphs with the greedy algorithms, the allocations from these files a
 
 import os
 import sys
-DIR = r"C:\Users\u0165132\OneDrive - KU Leuven\1-PhD\Causal-Inference-on-Networked-Data\OTAPI"
+DIR = r""
 os.chdir(DIR)
 sys.path.append(DIR)
 
@@ -33,7 +33,7 @@ do_random = True
 do_greedy_simulated = False
 do_full = False #turn this to true if going over all budgets
 get_TTE_curve_total = True #if true, TTE curve is plotted for different NT2O values
-run_extra = True #if true, extra experiments are run
+run_extra = False #if true, extra experiments are run
 spillover_mag_k = 250 #k for which the effect of beta_spillover is shown
 
 
