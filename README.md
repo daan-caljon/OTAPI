@@ -49,7 +49,7 @@ All code was written for ```python 3.10.13```.
 Download the data for the BC and Flickr dataset from [Google Drive](https://drive.google.com/drive/folders/16BDvaDuS19Tywji2xddWqV9l1GWJ6Bq1?usp=sharing). The original data comes from [this repo](https://github.com/rguo12/network-deconfounder-wsdm20).
 We use the same data as ([Jiang & Sun (2022)](https://github.com/songjiang0909/Causal-Inference-on-Networked-Data). 
 
-Put the data in the ```data/semi_synthetic/``` folder. Now, the results from the paper can be reproduced by setting the ```DIR``` variable to your directory and running the appropriate script. To reproduce Figures 5a and 5b, the results from the ```spillover*_experiment.py``` are needed
+Put the data in the ```data/semi_synthetic/``` folder. Now, the results from the paper can be reproduced by setting the ```DIR``` variable to your directory and running the appropriate script. To reproduce Figures 5a and 5b, the results from all the ```spillover*_experiment.py``` are needed
 before running the ```spillover_graphs.py``` file to generate the figures.
 
 ## Acknowledgements
