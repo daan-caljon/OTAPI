@@ -1,9 +1,12 @@
 figures/*
-data/*
+data/semi_synthetic/BC/*
+data/semi_synthetic/Flickr/*
 !data/semi_synthetic/BC/__init__.py
+!data/semi_synthetic/Flickr/__init__.py
+data/allocations/*
+data/simulated/*
 models/*
 Results/*
 __pycache__/
 *.py[cod]
 scripts/main.py
-.gitignore
