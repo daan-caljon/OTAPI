@@ -9,7 +9,7 @@ import argparse
 import pickle as pkl
 import src.methods.allocation.Genetic_algorithm as ga
 import src.methods.allocation.CELF as celf
-from src.methods.allocation.Predictions import *
+from methods.allocation.allocation_utils import *
 import os
 
 def run_allocations(dataset,T,do_GA,do_CELF,do_CFR,do_CFR_heuristic,do_greedy,do_random,do_greedy_simulated,

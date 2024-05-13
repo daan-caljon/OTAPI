@@ -2,7 +2,7 @@ import time
 import numpy as np
 import pygad
 import torch
-from src.methods.allocation.Predictions import *
+from methods.allocation.allocation_utils import *
 
 
 

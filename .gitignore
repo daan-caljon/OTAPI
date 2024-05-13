@@ -1,7 +1,9 @@
 figures/*
 data/*
+!data/semi_synthetic/BC/__init__.py
 models/*
 Results/*
 __pycache__/
 *.py[cod]
 scripts/main.py
+.gitignore
