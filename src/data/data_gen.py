@@ -7,15 +7,6 @@ from src.data.datatools import *
 
 
 
-#First generate the graph
-def Generate_data_barabasi_albert(nodes, edges_new_node, graph_seed = None, random_seed = None):
-    np.random.seed(random_seed)
-    random.seed(random_seed)
-    G = nx.barabasi_albert_graph(nodes, edges_new_node,seed = graph_seed)
-    for node in G.nodes:
-        G.nodes[node]["x1"] = round(random.normalvariate(0,1),3)
-    
-    return G
 def treatmentSimulation(w_c,X,A,betaConfounding,betaNeighborConfounding):
 
     covariate2TreatmentMechanism = sigmod(np.matmul(w_c,X.T))
