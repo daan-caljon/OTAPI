@@ -8,13 +8,12 @@ sys.path.append(DIR)
 
 import random
 import numpy as np
-import src.data.data_gen as data_gen
-import src.methods.causal_models.run_experiment as run_experiment
-import src.methods.allocation.Run_allocations as run_allocations
-import utils.Get_graphs as get_graphs
+import data.data_generator as data_generator
+import methods.causal_models.model_tuning as model_tuning
+import methods.allocation.get_allocations as run_allocations
+import utils.plotting as plotting
 import os
 import yaml
-import src.methods.allocation.Extra_experiments as extra
 
 #Set parameters for the simulation
 num_nodes = 2358 #does nothing when dataset is BC or Flickr
@@ -64,13 +63,13 @@ setting = dataset + "_num_nodes" + str(num_nodes) + "_T2O_" + str(betaTreat2Outc
 if not do_only_allocations:
     
 
-    data_gen.simulate_data(dataset= dataset,w_c = w_c,w = w,w_beta_T2Y = w_beta_T2Y,betaConfounding = betaConfounding,betaNeighborConfounding = betaNeighborConfounding,
+    data_generator.simulate_data(dataset= dataset,w_c = w_c,w = w,w_beta_T2Y = w_beta_T2Y,betaConfounding = betaConfounding,betaNeighborConfounding = betaNeighborConfounding,
                         betaTreat2Outcome = betaTreat2Outcome,bias_T2Y = bias_T2Y,betaCovariate2Outcome = betaCovariate2Outcome,betaNeighborCovariate2Outcome = betaNeighborCovariate2Outcome,
                         betaNeighborTreatment2Outcome = betaNeighborTreatment2Outcome,betaNoise = betaNoise,beta0 = beta0,nodes = num_nodes,flipRate = flipRate,covariate_dim = covariate_dim,setting = setting)
 
     #Hyperparameter tuning for each dataset
     """-------------------MODEL TRAINING-------------------"""
-    config_netest, val_loss_netest, config_CFR, val_loss_CFR =  run_experiment.train_best_models(dataset = dataset,setting = setting)
+    config_netest, val_loss_netest, config_CFR, val_loss_CFR =  model_tuning.train_best_models(dataset = dataset,setting = setting)
     directory = "models/" + setting + "/"
     if not os.path.exists(directory):
         os.makedirs(directory)
@@ -122,16 +121,16 @@ if do_full:
 
 node_list = node_list[cutoff:]
 
-get_graphs.get_liftup_graph(node_list= node_list,total_nodes = num_nodes,setting = setting,do_greedy = do_greedy,
+plotting.get_liftup_graph(node_list= node_list,total_nodes = num_nodes,setting = setting,do_greedy = do_greedy,
                             do_GA = do_GA,do_CELF = do_CELF,do_CFR = do_CFR,do_CFR_heuristic = do_CFR_heuristic,
                             do_random = do_random,do_greedy_simulated = do_greedy_simulated,do_full = do_full,T=T)
 
 
-get_graphs.get_similarity_matrix(total_nodes=num_nodes,setting = setting,do_greedy = do_greedy,
+plotting.get_similarity_matrix(total_nodes=num_nodes,setting = setting,do_greedy = do_greedy,
                                  do_GA = do_GA,do_CELF = do_CELF,do_CFR = do_CFR,do_CFR_heuristic = do_CFR_heuristic,
                                  do_random = do_random,do_greedy_simulated = do_greedy_simulated,do_full = do_full,my_T=similarity_k)
 
 #Show degree distribution:
 if get_degree_distribution:
-    get_graphs.get_degree_dist(dataset = dataset,setting = setting)
+    plotting.get_degree_dist(dataset = dataset,setting = setting)
 

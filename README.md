@@ -16,29 +16,30 @@ OTAPI/
   |_ spillover0.3_experiment.py      # "" == 0.3
   |_ spillover0.5_experiment.py      # "" == 0.5
   |_ spillover0.7_experiment.py      # "" == 0.7
-  |_ spillover_graphs.py             # Get graphs after all spillover experiments 
+  |_ spillover_figures.py            # Generate figures after all spillover experiments 
   |_ watts_strogatz.py
 |_ src/
   |_ data/
-    |_ data_gen.py                 # Code to generate synthetic and semi-synthetic data
+    |_ data_generator.py                 # Code to generate synthetic and semi-synthetic data
     |_ datatools.py                 
   |_ methods/
     |_ allocation/         # Allocation optimization
-      |_ CELF.py                    # Code for CELF algorithm
-      |_ Extra_experiments.py       # Code to run extra experiments for the appendix
-      |_ Genetic_algorithm.py       # Code for genetic algorithms
-      |_ allocation_utils.py        # Utils for the allocations
-      |_ Run_allocations.py         # Code to run and save the allocations
+      |_ utils/
+        |_ CELF.py                    # Code for CELF algorithm
+        |_ Genetic_algorithm.py       # Code for genetic algorithms
+        |_ allocation_utils.py        # Utils for the allocations
+      |_ extra_allocations.py       # Code to run extra experiments for the appendix
+      |_ get_allocations.py         # Code to run and save the allocations
     |_ causal_models/         # Train relational causal estimator
       |_ baselineModels.py          # Baseline models (e.g., TARNet and CFR)
-      |_ experiment.py              # Model training and evaluation
+      |_ model_training.py          # Model training and evaluation
       |_ layers.py                  
       |_ model.py                   # NetEst model
       |_ modules.py                 
-      |_ run_experiment.py          # Train best model
-  |_ utils/
-    |_ Get_graphs.py/      # Generate figures
-    |_ utils.py/      
+      |_ model_tuning.py            # Train best model
+    |_ utils/
+      |_ plotting.py/      # Generate figures
+      |_ utils.py/      
 ```
 
 ## Installation.
@@ -50,7 +51,7 @@ Download the data for the BC and Flickr dataset from [Google Drive](https://driv
 We use the same data as ([Jiang & Sun (2022)](https://github.com/songjiang0909/Causal-Inference-on-Networked-Data). 
 
 Put the data in the ```data/semi_synthetic/``` folder. Now, the results from the paper can be reproduced by setting the ```DIR``` variable to your directory and running the appropriate script. To reproduce Figures 5a and 5b, the results from all the ```spillover*_experiment.py``` are needed
-before running the ```spillover_graphs.py``` file to generate the figures.
+before running the ```spillover_figures.py``` file to generate the figures.
 
 ## Acknowledgements
 Our code builds upon the code from [Jiang & Sun (2022)](https://github.com/songjiang0909/Causal-Inference-on-Networked-Data). 

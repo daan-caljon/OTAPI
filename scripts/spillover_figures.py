@@ -12,13 +12,9 @@ sys.path.append(DIR)
 
 import random
 import numpy as np
-import src.data.data_gen as data_gen
-import src.methods.causal_models.run_experiment as run_experiment
-import src.methods.allocation.Run_allocations as run_allocations
-import utils.Get_graphs as get_graphs
+import utils.plotting as plotting
 import os
-import yaml
-import src.methods.allocation.Extra_experiments as extra
+import methods.allocation.extra_allocations as extra
 
 #Set parameters for the simulation
 num_nodes = 5000 #does nothing when dataset is BC or Flickr
@@ -93,6 +89,6 @@ if get_TTE_curve_total:
     for NT2O in NT2O_list:
         setting = dataset + "_num_nodes" + str(num_nodes) + "_T2O_" + str(betaTreat2Outcome) + "_NT2O_" + str(NT2O) + "_seed_" + str(random_seed)
         setting_list.append(setting)
-    get_graphs.get_TTE_curve_total(k =spillover_mag_k,dataset = dataset,setting_list = setting_list,NT2O_list=NT2O_list,do_greedy=do_greedy,
+    plotting.get_TTE_curve_total(k =spillover_mag_k,dataset = dataset,setting_list = setting_list,NT2O_list=NT2O_list,do_greedy=do_greedy,
                                    do_GA=do_GA,do_CELF=do_CELF,do_CFR = do_CFR,do_greedy_simulated=do_greedy_simulated)
 

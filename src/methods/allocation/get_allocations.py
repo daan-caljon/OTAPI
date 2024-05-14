@@ -1,15 +1,7 @@
 import torch
-import time
 import utils.utils as utils
-import numpy as np
-from src.methods.causal_models.model import NetEstimator
-from  src.methods.causal_models.baselineModels import GCN_DECONF,CFR,GCN_DECONF_INTERFERENCE,CFR_INTERFERENCE
-from  src.methods.causal_models.experiment import Experiment
-import argparse
 import pickle as pkl
-import src.methods.allocation.Genetic_algorithm as ga
-import src.methods.allocation.CELF as celf
-from methods.allocation.allocation_utils import *
+from methods.allocation.utils.allocation_utils import *
 import os
 
 def run_allocations(dataset,T,do_GA,do_CELF,do_CFR,do_CFR_heuristic,do_greedy,do_random,do_greedy_simulated,
