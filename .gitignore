@@ -10,3 +10,4 @@ Results/*
 __pycache__/
 *.py[cod]
 scripts/main.py
+requirements_copy.txt

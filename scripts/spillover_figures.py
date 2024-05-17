@@ -2,6 +2,7 @@
 Change spillover_mag_k to get different values of k
 First the models from the spillover...py files have to be trained to run this file
 To get the graphs with the greedy algorithms, the allocations from these files also have to be run
+To just get the graphs without the degree algorithms, this file can be used
 """
 
 import os
@@ -66,7 +67,7 @@ if dataset == "Flickr":
     T = 2358
     num_nodes = 2358
 
-"""-------------------FIGURE GENERATION-------------------"""
+"""Allocation for node_list and spillover effect list"""
 
 
 
@@ -83,6 +84,7 @@ if run_extra:
                                 betaNeighborCovariate2Outcome = betaNeighborCovariate2Outcome,betaNeighborTreatment2Outcome = NT2O,betaNoise = betaNoise,setting = setting,node_list = my_node_list,do_full = do_full,num_nodes = num_nodes)
 
 
+"""-------------------FIGURE GENERATION-------------------"""
 if get_TTE_curve_total:
     NT2O_list = [0,0.1,0.3,0.5,0.7]
     setting_list = []
