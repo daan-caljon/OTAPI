@@ -39,7 +39,7 @@ OTAPI/
       |_ model_tuning.py            # Train best model
     |_ utils/
       |_ plotting.py/      # Generate figures
-      |_ utils.py/      
+      |_ utils.py/
 ```
 
 ## Installation.
@@ -47,8 +47,8 @@ The ```requirements.txt``` provides the necessary packages.
 All code was written for ```python 3.10.13```.
 
 ## Usage
-Download the data for the BC and Flickr dataset from [Google Drive](https://drive.google.com/drive/folders/16BDvaDuS19Tywji2xddWqV9l1GWJ6Bq1?usp=sharing). The original data comes from [this repo](https://github.com/rguo12/network-deconfounder-wsdm20).
-We use the same data as ([Jiang & Sun (2022)](https://github.com/songjiang0909/Causal-Inference-on-Networked-Data). 
+Download the data for the BC and Flickr dataset from [Google Drive](https://drive.google.com/drive/folders/1Euk3B2VIa7UTGTkeWidbwwmP6O6K6207?usp=sharing). The original data comes from [this repo](https://github.com/rguo12/network-deconfounder-wsdm20).
+We use the same data as [Jiang & Sun (2022)](https://github.com/songjiang0909/Causal-Inference-on-Networked-Data). 
 
 Put the data in the ```data/semi_synthetic/``` folder. Now, the results from the paper can be reproduced by setting the ```DIR``` variable to your directory and running the appropriate script. To reproduce Figures 5a and 5b, the results from all the ```spillover*_experiment.py``` are needed
 before running the ```spillover_figures.py``` file to generate the figures.
