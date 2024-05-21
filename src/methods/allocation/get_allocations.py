@@ -1,7 +1,7 @@
 import torch
-import utils.utils as utils
+import src.utils.utils as utils
 import pickle as pkl
-from methods.allocation.utils.allocation_utils import *
+from src.methods.allocation.utils.allocation_utils import *
 import os
 
 def run_allocations(dataset,T,do_GA,do_CELF,do_CFR,do_CFR_heuristic,do_greedy,do_random,do_greedy_simulated,

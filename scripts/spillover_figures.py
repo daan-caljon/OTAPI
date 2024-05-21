@@ -13,9 +13,9 @@ sys.path.append(DIR)
 
 import random
 import numpy as np
-import utils.plotting as plotting
+import src.utils.plotting as plotting
 import os
-import methods.allocation.extra_allocations as extra
+import src.methods.allocation.extra_allocations as extra
 
 #Set parameters for the simulation
 num_nodes = 5000 #does nothing when dataset is BC or Flickr

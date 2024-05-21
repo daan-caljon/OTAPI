@@ -1,11 +1,11 @@
 import argparse
 import torch
 import time
-import utils.utils as utils
+import src.utils.utils as utils
 import numpy as np
 from src.methods.causal_models.model import NetEstimator
 from src.methods.causal_models.baselineModels import GCN_DECONF,CFR,GCN_DECONF_INTERFERENCE,CFR_INTERFERENCE
-from methods.causal_models.model_training import Experiment
+from src.methods.causal_models.model_training import Experiment
 import itertools
 
 def run_model(dataset,model,epochs,lr,setting, n_in = 1, n_out = 1):

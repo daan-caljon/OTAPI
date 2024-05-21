@@ -2,7 +2,7 @@ import argparse
 import torch
 import pickle as pkl
 import torch.nn as nn
-import utils.utils as utils
+import src.utils.utils as utils
 import numpy as np
 from src.methods.causal_models.modules import GCN, NN, Predictor,Discriminator
 import torch.nn as nn

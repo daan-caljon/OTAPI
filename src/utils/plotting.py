@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 import yaml
 import pandas as pd
 import os
-import utils.utils as utils
+import src.utils.utils as utils
 
 def get_TTE(solution_dict,num_nodes):
     TTE= []

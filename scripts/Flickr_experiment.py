@@ -2,16 +2,16 @@
 
 import os
 import sys
-DIR = r""
+DIR = r"C:\Users\u0165132\OneDrive - KU Leuven\1-PhD\Causal-Inference-on-Networked-Data\OTAPI"
 os.chdir(DIR)
 sys.path.append(DIR)
 
 import random
 import numpy as np
-import data.data_generator as data_generator
-import methods.causal_models.model_tuning as model_tuning
-import methods.allocation.get_allocations as run_allocations
-import utils.plotting as plotting
+import src.data.data_generator as data_generator
+import src.methods.causal_models.model_tuning as model_tuning
+import src.methods.allocation.get_allocations as run_allocations
+import src.utils.plotting as plotting
 import os
 import yaml
 

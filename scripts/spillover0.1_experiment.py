@@ -10,13 +10,12 @@ sys.path.append(DIR)
 
 import random
 import numpy as np
-import data.data_generator as data_generator
-import methods.causal_models.model_tuning as model_tuning
-import methods.allocation.get_allocations as run_allocations
-import utils.plotting as plotting
+import src.data.data_generator as data_generator
+import src.methods.causal_models.model_tuning as model_tuning
+import src.methods.allocation.get_allocations as run_allocations
+import src.utils.plotting as plotting
 import os
 import yaml
-
 
 #Set parameters for the simulation
 num_nodes = 5000 #does nothing when dataset is BC or Flickr

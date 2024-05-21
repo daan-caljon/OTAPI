@@ -1,9 +1,9 @@
 import numpy as np
 import torch
-import utils.utils as utils
+import src.utils.utils as utils
 import time as time
-import methods.allocation.utils.Genetic_algorithm as ga
-import methods.allocation.utils.CELF as celf
+import src.methods.allocation.utils.Genetic_algorithm as ga
+import src.methods.allocation.utils.CELF as celf
 
 def predict_outcome(model,A,X,T,PO,normalize=False):
     """
