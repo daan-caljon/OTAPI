@@ -1,7 +1,14 @@
+"""
+By running this code, Figure 10 from the paper can be reproduced. 
+Fill in the right directory path in the DIR variable.
+The runtimes are stored as .yaml files in the allocations folder of the respective dataset.
+Set the budgets by changing the parameter budgets below.
+"""
+
 #experiment with simulated data with different num_nodes
 import os
 import sys
-DIR = r"C:\Users\u0165132\OneDrive - KU Leuven\1-PhD\Causal-Inference-on-Networked-Data\OTAPI"
+DIR = r""
 os.chdir(DIR)
 sys.path.append(DIR)
 
@@ -16,12 +23,11 @@ import yaml
 
 
 #Set parameters for the simulation
-num_nodes = 500 #does nothing when dataset is BC or Flickr 
+num_nodes = 500 #Change this to see impact of num_nodes on runtime!
 dataset = "full_sim" #BC, Flickr, full_sim, email-EU, enron
 T = int(0.05*num_nodes) #number of treated nodes
 #5,20,50 % of nodes
 budgets = [int(0.05*num_nodes),int(0.2*num_nodes),int(0.5*num_nodes)] #list of budgets to run the allocations on
-# T = 100 #for testing purposes
 do_greedy =  True 
 do_GA = False
 do_CELF = False

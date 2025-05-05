@@ -1,3 +1,7 @@
+"""
+Different version of the allocations scripts that is used to measure the runtime
+"""
+
 import torch
 import src.utils.utils as utils
 import pickle as pkl

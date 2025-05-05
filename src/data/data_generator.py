@@ -7,7 +7,6 @@ from src.data.datatools import *
 from src.data.node2vec import generate_node_embeddings
 
 
-
 def treatmentSimulation(w_c,X,A,betaConfounding,betaNeighborConfounding):
 
     covariate2TreatmentMechanism = sigmod(np.matmul(w_c,X.T))

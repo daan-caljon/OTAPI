@@ -1,9 +1,8 @@
+"""
+By running this code, Figure 9b and 9c from the paper can be reproduced. 
+Fill in the right directory path in the DIR variable.
+"""
 
-
-# Allocate a large tensor to test memory handling
-# x = torch.rand((10000, 10000), device='cuda')
-# y = torch.mm(x, x)
-# stop
 import os
 import sys
 DIR = r""
