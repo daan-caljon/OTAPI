@@ -50,7 +50,7 @@ The ```requirements.txt``` provides the necessary packages.
 All code was written for ```python 3.10.13```.
 
 ## Usage
-Download the data for the BC, Enron, and Flickr datasets from [Google Drive](https://drive.google.com/drive/folders/1CGOKpd7NU-brk9PpiO6nJcVYp3idi97E?usp=sharing). The original Flickr and BC data comes from [this repo](https://github.com/rguo12/network-deconfounder-wsdm20). We use the same data as [Jiang & Sun (2022)](https://github.com/songjiang0909/Causal-Inference-on-Networked-Data). The orginal Enron dataset comes from [Network Repository](https://networkrepository.com/ia-enron-large.php)
+Download the data for the BC, Enron, and Flickr datasets from [Google Drive](https://drive.google.com/drive/folders/1CGOKpd7NU-brk9PpiO6nJcVYp3idi97E?usp=sharing). The original Flickr and BC data comes from [this repo](https://github.com/rguo12/network-deconfounder-wsdm20). We use the same data as [Jiang & Sun (2022)](https://github.com/songjiang0909/Causal-Inference-on-Networked-Data). The orginal Enron dataset comes from [Network Repository](https://networkrepository.com/ia-enron-large.php).
 
 Put the data in the ```data/semi_synthetic/``` folder. Now, the results from the paper can be reproduced by setting the ```DIR``` variable to your directory and running the appropriate script. To reproduce Figures 5a and 5b, the results from all the ```spillover*_experiment.py``` are needed
 before running the ```spillover_figures.py``` file to generate the figures.
