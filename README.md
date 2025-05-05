@@ -10,7 +10,9 @@ OTAPI/
     |_ Flickr/
 |_ scripts/
   |_ BC_experiment.py                    
+  |_ Enron_experiment.py                    
   |_ Flickr_experiment.py
+  |_ runtime_experiment.py           #Measure runtimes of the different methods  
   |_ spillover0_experiment.py        #Experiment with spillover effect == 0    
   |_ spillover0.1_experiment.py      # "" == 0.1
   |_ spillover0.3_experiment.py      # "" == 0.3
@@ -28,6 +30,7 @@ OTAPI/
         |_ CELF.py                    # Code for CELF algorithm
         |_ Genetic_algorithm.py       # Code for genetic algorithms
         |_ allocation_utils.py        # Utils for the allocations
+      |_ allocations_runtime.py     # Code to measure the runtime of the allocation methods
       |_ extra_allocations.py       # Code to run extra experiments for the appendix
       |_ get_allocations.py         # Code to run and save the allocations
     |_ causal_models/         # Train relational causal estimator
