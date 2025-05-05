@@ -130,10 +130,10 @@ def get_liftup_graph(node_list,total_nodes,setting,do_greedy,do_GA,do_CELF,do_CF
     legend_fig.savefig(legend_path, dpi=300, bbox_inches='tight', format='pdf')
 
     # Close the legend figure to free up resources
-    plt.close(legend_fig)
+    plt.close()
 
     # Show the plot (optional)
-    plt.show()
+    # plt.show()
 
 
     #i can be used to cut off part of the curve
@@ -188,6 +188,7 @@ def get_liftup_graph(node_list,total_nodes,setting,do_greedy,do_GA,do_CELF,do_CF
     ax.set_ylabel('Liftup')
     handles, labels = plt.gca().get_legend_handles_labels()
     order = [1, 0, 4, 5, 3, 2, 6]
+    order = [0,1,4,3,2]
     my_handles = [handles[idx] for idx in order]
     my_labels = [labels[idx] for idx in order]
     ax.legend(labels = my_labels,
@@ -201,7 +202,7 @@ def get_liftup_graph(node_list,total_nodes,setting,do_greedy,do_GA,do_CELF,do_CF
     liftup_curve_path = my_path_results + extra + 'Liftup_curve.pdf'
     plt.savefig(liftup_curve_path, dpi=300, bbox_inches='tight',format = "pdf")
     # Show the plot
-    plt.show()
+    plt.close()
     #save the solutions dicts with settings
     with open(my_path_results + 'TTE_degree.pkl', 'wb') as file:
         # Save the data to the .pkl file
@@ -283,7 +284,7 @@ def get_liftup_graph(node_list,total_nodes,setting,do_greedy,do_GA,do_CELF,do_CF
     path_influence = my_path_results + extra + 'Influence_spread.pdf'
     plt.savefig(path_influence, dpi=500, bbox_inches='tight',format = "pdf")
     # Show the plot
-    plt.show()
+    plt.close()
     #create matrix with each element the percentage of common selected nodes for all methods
     #We do this at 5% nodes:
     #Plot raw:
@@ -323,8 +324,7 @@ def get_liftup_graph(node_list,total_nodes,setting,do_greedy,do_GA,do_CELF,do_CF
     path_influence = my_path_results + extra + 'sum_PO.pdf'
     plt.savefig(path_influence, dpi=500, bbox_inches='tight',format = "pdf")
     # Show the plot
-    plt.show()
-
+    plt.close()
 def get_similarity_matrix(total_nodes,setting,do_greedy,do_GA,
                               do_CELF,do_CFR,do_CFR_heuristic,do_random,do_greedy_simulated,do_full,my_T):
     
@@ -650,7 +650,7 @@ def get_TTE_curve_total(k,dataset,setting_list,NT2O_list,do_greedy = True,do_GA=
     plt.savefig(my_path_results, dpi=300, bbox_inches='tight', format="pdf")
 
     # Show the plot (optional)
-    plt.show()
+    plt.close()
 
 
         

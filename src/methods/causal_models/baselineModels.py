@@ -141,7 +141,7 @@ class CFR(nn.Module):
             self.pp = self.pp.cuda()
         self.pp_act = nn.Sigmoid()
 
-    def forward(self, adj,x, t, Z=None,):
+    def forward(self,edge_index, adj,x, t, Z=None,):
 
         if Z is None:
             neighbors = torch.sum(adj, 1)

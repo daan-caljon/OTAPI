@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+from torch_geometric.nn import GCNConv
 import torch.nn.functional as F
 from src.methods.causal_models.layers import GraphConvolution
 
@@ -51,6 +52,15 @@ class GCN(nn.Module):
         #x = F.dropout(x, self.dropout)
         x= self.dropout(x)
         return x
+
+class GCNLayer(torch.nn.Module):
+    def __init__(self, in_channels, hidden_channels,dropout):
+        super(GCNLayer, self).__init__()
+        self.conv = GCNConv(in_channels, hidden_channels)
+        self.dropout = nn.Dropout(dropout)
+    
+    def forward(self, x, edge_index):
+        return self.conv(x, edge_index)
 
 class NN(nn.Module):
     def __init__(self,in_dim,out_dim):

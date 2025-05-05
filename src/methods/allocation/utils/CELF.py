@@ -23,7 +23,7 @@ import heapq
     We also check if the node with the highest marginal gain at that point has already done MC simulations
 
     """
-def CELF(A,p,T,num_simulations=1000):
+def CELF(A,p,T,num_simulations=1000,budgets=None):
     """
     Function to run the CELF algorithm
     :param A: adjacency matrix
@@ -33,6 +33,14 @@ def CELF(A,p,T,num_simulations=1000):
     :return: solution, binary array, current influence, solution dictionary, spread list, time list
     solution dictionary contains the solution at each iteration
     """
+
+    
+    budget_dict = {}
+    current_budget = budgets[0]
+    if len(budgets) > 1:
+        budgets = budgets[1:]
+    start_time_budget = time.time()
+
     solution_dict = {}
     spread_list = []
     time_list = []
@@ -75,6 +83,17 @@ def CELF(A,p,T,num_simulations=1000):
             else:
                 node = new_node
         #print("pq",pq)
+        
+        if current_budget == last_iteration_calculated:
+            budget_dict[current_budget] = time.time() - start_time_budget
+            current_budget = budgets[0]
+            if len(budgets) > 1:
+                budgets = budgets[1:]
+                
+
+                
+
+
         current_influence += current_influence_difference
         solution.append(node)
         print("solution",solution)
@@ -87,7 +106,8 @@ def CELF(A,p,T,num_simulations=1000):
     for node in solution:
         zeros_array[node] = 1
     binary_array = zeros_array
-    return solution, binary_array,current_influence, solution_dict,spread_list, time_list
+    
+    return solution, binary_array,current_influence, solution_dict,spread_list, time_list,budget_dict
 
 
 #MC simulation

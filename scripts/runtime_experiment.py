@@ -1,17 +1,4 @@
-"""This code runs the allocations for beta_spillover (betaNeighborTreatment2Outcome) = 0.3
-Figures 10e and 10f are generated
-"""
-import torch
-print("torch version:", torch.__version__)
-print("CUDA available:", torch.cuda.is_available())
-print("CUDA version (compiled):", torch.version.cuda)
-print("Current device:", torch.cuda.current_device())
-print("Device name:", torch.cuda.get_device_name(0))
-
-# Allocate a large tensor to test memory handling
-# x = torch.rand((10000, 10000), device='cuda')
-# y = torch.mm(x, x)
-# stop
+#experiment with simulated data with different num_nodes
 import os
 import sys
 DIR = r"C:\Users\u0165132\OneDrive - KU Leuven\1-PhD\Causal-Inference-on-Networked-Data\OTAPI"
@@ -22,29 +9,31 @@ import random
 import numpy as np
 import src.data.data_generator as data_generator
 import src.methods.causal_models.model_tuning as model_tuning
-import src.methods.allocation.get_allocations as run_allocations
+import src.methods.allocation.allocations_runtime as allocations_runtime
 import src.utils.plotting as plotting
 import os
 import yaml
 
 
 #Set parameters for the simulation
-num_nodes = 5000 #does nothing when dataset is BC or Flickr
-dataset = "full_sim" #BC, Flickr, full_sim, email-EU
-# T = int(0.05*num_nodes) #number of treated nodes
-T = 10 #for testing purposes
+num_nodes = 500 #does nothing when dataset is BC or Flickr 
+dataset = "full_sim" #BC, Flickr, full_sim, email-EU, enron
+T = int(0.05*num_nodes) #number of treated nodes
+#5,20,50 % of nodes
+budgets = [int(0.05*num_nodes),int(0.2*num_nodes),int(0.5*num_nodes)] #list of budgets to run the allocations on
+# T = 100 #for testing purposes
 do_greedy =  True 
-do_GA = True
-do_CELF = True
+do_GA = False
+do_CELF = False
 do_CFR = True #TARnet (alpha = 0)
 do_CFR_heuristic = False  #combine degree and uplift heuristic
 do_random = True
 do_greedy_simulated = True
 do_full = False #turn this to true if going over all budgets
-do_only_allocations = False #if true, the data generation and training step are skipped
+do_only_allocations = True #if true, the data generation and training step are skipped
 do_only_graphs = False #if true allocations are skipped
 get_degree_distribution = True #if true, degree distribution is plotted
-similarity_k = 250 #k for which the similarity matrix is generated
+similarity_k = 100 #k for which the similarity matrix is generated
 
 
 
@@ -111,7 +100,7 @@ if dataset == "Flickr":
     T = 2358
     num_nodes = 2358
 if not do_only_graphs:
-    run_allocations.run_allocations(dataset=dataset,T=T,do_greedy=do_greedy,do_GA=do_GA,do_CELF=do_CELF,do_CFR = do_CFR,do_CFR_heuristic=do_CFR_heuristic,
+    allocations_runtime.run_allocations_runtime(budgets=budgets,dataset=dataset,T=T,do_greedy=do_greedy,do_GA=do_GA,do_CELF=do_CELF,do_CFR = do_CFR,do_CFR_heuristic=do_CFR_heuristic,
                                 do_random =do_random, do_greedy_simulated=do_greedy_simulated,w_c = w_c,w = w,w_beta_T2Y = w_beta_T2Y,
                                 betaTreat2Outcome = betaTreat2Outcome,bias_T2Y = bias_T2Y,betaCovariate2Outcome = betaCovariate2Outcome,betaNeighborCovariate2Outcome = betaNeighborCovariate2Outcome,
                                 betaNeighborTreatment2Outcome = betaNeighborTreatment2Outcome,betaNoise = betaNoise,beta0 = beta0,setting = setting,do_full= do_full,
@@ -120,7 +109,7 @@ if not do_only_graphs:
 """-------------------FIGURE GENERATION-------------------"""
 
 #node list for generating figures
-cutoff = 0
+cutoff = 20
 node_list = [1]
 if not do_full:
 

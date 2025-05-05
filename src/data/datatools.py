@@ -49,6 +49,27 @@ def readData(dataset):
             
     return data,parts
 
+def load_EU_network():
+    train_network = sio.mmread(r"data/semi_synthetic/EU/EUTrain.mtx")
+    val_network = sio.mmread(r"data/semi_synthetic/EU/EUVal.mtx")
+    test_network = sio.mmread(r"data/semi_synthetic/EU/EUTest.mtx")
+    # train_network = train_network.toarray()
+    # val_network = val_network.toarray()
+    # test_network = test_network.toarray()
+
+    return train_network, val_network, test_network
+def load_enron_network():
+    train_network = sio.mmread(r"data/semi_synthetic/Enron/EnronTrain.mtx")
+    val_network = sio.mmread(r"data/semi_synthetic/Enron/EnronVal.mtx")
+    test_network = sio.mmread(r"data/semi_synthetic/Enron/EnronTest.mtx")
+    # train_network = train_network.toarray()
+    # val_network = val_network.toarray()
+    # test_network = test_network.toarray()
+
+    return train_network, val_network, test_network
+
+
+
 
 def saveData(dataset,data,expID,flipRate):
     if dataset == "BC":

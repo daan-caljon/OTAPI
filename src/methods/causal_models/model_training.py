@@ -1,5 +1,7 @@
 
 import torch
+from torch_geometric.nn import GCNConv
+from torch_geometric.utils import dense_to_sparse
 import pickle as pkl
 import torch.nn as nn
 import torch.optim as optim
@@ -64,6 +66,8 @@ class Experiment():
         print(self.model)
 
         self.Tensor = torch.cuda.FloatTensor if self.args.cuda else torch.FloatTensor
+        device = torch.device("cuda" if self.args.cuda else "cpu")
+        self.Tensor = lambda *args, **kwargs: torch.tensor(*args, dtype=torch.float, device=device, **kwargs)
         self.trainA = trainA 
         self.trainX = trainX
         self.trainT = trainT
@@ -107,7 +111,6 @@ class Experiment():
         self.test_t0z7 = self.Tensor(test_t0z7)
         self.test_t0z2 = self.Tensor(test_t0z2)
 
-
         """PO normalization if any"""
         self.YFTrain,self.YCFTrain = utils.PO_normalize(self.args.normy,self.POTrain,self.POTrain,self.cfPOTrain)
         self.YFVal,self.YCFVal = utils.PO_normalize(self.args.normy,self.POTrain,self.POVal,self.cfPOVal)
@@ -129,6 +132,7 @@ class Experiment():
             self.loss = self.loss.cuda()
             self.bce_loss = self.bce_loss.cuda()
             self.peheLoss = self.peheLoss.cuda()
+            print("Loss function is on cuda")
 
         self.lossTrain = []
         self.lossVal = []
@@ -155,8 +159,10 @@ class Experiment():
 
         self.predT = []
         self.labelT = []
-      
-    
+        self.train_edge_index = dense_to_sparse(self.trainA)[0].to(self.device)
+        self.val_edge_index = dense_to_sparse(self.valA)[0].to(self.device)
+        self.test_edge_index = dense_to_sparse(self.testA)[0].to(self.device)
+
 
     def get_peheLoss(self,y1pred,y0pred,y1gt,y0gt):
         pred = y1pred - y0pred
@@ -170,11 +176,11 @@ class Experiment():
         
         
 
-    def train_one_step_discriminator(self,A,X,T):
+    def train_one_step_discriminator(self,edge_index,A,X,T,Z=None):
 
         self.model.train()
         self.optimizerD.zero_grad()
-        pred_treatmentTrain,_, _, _,_ = self.model(A,X,T)
+        pred_treatmentTrain,_, _, _,_ = self.model(edge_index,A,X,T,Z)
         discLoss = self.bce_loss(pred_treatmentTrain.reshape(-1),T)
         num = pred_treatmentTrain.shape[0]
         target05 = [0.5 for _ in range(num)]
@@ -185,10 +191,10 @@ class Experiment():
         return discLoss,discLosshalf
 
 
-    def eval_one_step_discriminator(self,A,X,T):
+    def eval_one_step_discriminator(self,edge_index,A,X,T,Z=None):
 
         self.model.eval()
-        pred_treatment,_,_,_,_ = self.model(A,X,T)
+        pred_treatment,_,_,_,_ = self.model(edge_index,A,X,T,Z)
         discLossWatch = self.bce_loss(pred_treatment.reshape(-1), T)
         num = pred_treatment.shape[0]
         target05 = [0.5 for _ in range(num)]
@@ -204,8 +210,8 @@ class Experiment():
 
 
                 
-            discLoss,discLossTrainhalf = self.train_one_step_discriminator(self.trainA, self.trainX, self.trainT)
-            discLossVal,discLossValhalf,_,_ = self.eval_one_step_discriminator(self.valA,self.valX,self.valT)
+            discLoss,discLossTrainhalf = self.train_one_step_discriminator(self.train_edge_index, self.trainA,self.trainX, self.trainT,self.trainZ)
+            discLossVal,discLossValhalf,_,_ = self.eval_one_step_discriminator(self.val_edge_index, self.valA,self.valX,self.valT,self.valZ)
             #discLossTest,discLossTesthalf,_,_ = self.eval_one_step_discriminator(self.testA,self.testX,self.testT)
             #change to avg ones if works
             if ds == self.args.dstep-1:
@@ -224,12 +230,13 @@ class Experiment():
                 self.dissValHalf.append(discLossValhalf.detach().cpu().numpy())
 
 
-    def train_one_step_discriminator_z(self,A,X,T):
+    def train_one_step_discriminator_z(self,edge_index,A,X,T,Z=None):
 
         self.model.train()
         self.optimizerD_z.zero_grad()
-        _,pred_zTrain,_, _,labelZ = self.model(A,X,T)
-        discLoss_z = self.d_zLoss(pred_zTrain.reshape(-1),labelZ)
+        _,pred_zTrain,_, _,labelZ = self.model(edge_index,A,X,T,Z)
+        # discLoss_z = self.d_zLoss(pred_zTrain.reshape(-1),labelZ) # this is the original loss
+        discLoss_z = self.d_zLoss(pred_zTrain.reshape(-1),Z)
         num = pred_zTrain.shape[0]
         target = self.Tensor(np.random.uniform(low=0.0, high=1.0, size=num))
         discLosshalf_z = self.d_zLoss(pred_zTrain.reshape(-1), self.Tensor(target))
@@ -239,11 +246,12 @@ class Experiment():
         return discLoss_z,discLosshalf_z
 
 
-    def eval_one_step_discriminator_z(self,A,X,T):
+    def eval_one_step_discriminator_z(self,edge_index,A,X,T,Z=None):
 
         self.model.eval()
-        _,pred_z,_,_,labelZ = self.model(A,X,T)
-        discLossWatch = self.d_zLoss(pred_z.reshape(-1), labelZ)
+        _,pred_z,_,_,labelZ = self.model(edge_index,A,X,T,Z)
+        # discLossWatch = self.d_zLoss(pred_z.reshape(-1), labelZ)
+        discLossWatch = self.d_zLoss(pred_z.reshape(-1),Z) # this is the original loss
         num = pred_z.shape[0]
         target = self.Tensor(np.random.uniform(low=0.0, high=1.0, size=num))
         discLosshalf = self.d_zLoss(pred_z.reshape(-1), self.Tensor(target))
@@ -256,8 +264,8 @@ class Experiment():
         for dzs in range(self.args.d_zstep):
 
 
-            discLoss_z,discLoss_zTrainRandom = self.train_one_step_discriminator_z(self.trainA, self.trainX, self.trainT)
-            discLoss_zVal,discLoss_zValRandom,_,_ = self.eval_one_step_discriminator_z(self.valA,self.valX,self.valT)
+            discLoss_z,discLoss_zTrainRandom = self.train_one_step_discriminator_z(self.train_edge_index,self.trainA, self.trainX, self.trainT,self.trainZ)
+            discLoss_zVal,discLoss_zValRandom,_,_ = self.eval_one_step_discriminator_z(self.val_edge_index,self.valA,self.valX,self.valT,self.valZ)
             #discLoss_zTest,discLoss_zTestRandom,_,_ = self.eval_one_step_discriminator_z(self.testA,self.testX,self.testT)
 
             if dzs == self.args.d_zstep-1:
@@ -276,13 +284,13 @@ class Experiment():
                 self.diss_zValHalf.append(discLoss_zValRandom.detach().cpu().numpy())
 
 
-    def train_one_step_encoder_predictor(self,A,X,T,Y):
+    def train_one_step_encoder_predictor(self,edge_index,A,X,T,Z,Y):
         
         if self.args.model == "NetEstimator":
             self.model.zero_grad()
             self.model.train()
             self.optimizerP.zero_grad()
-            pred_treatmentTrain, pred_zTrain,pred_outcomeTrain,_,_ = self.model(A,X,T)
+            pred_treatmentTrain, pred_zTrain,pred_outcomeTrain,_,_ = self.model(edge_index,A,X,T,Z)
             pLoss = self.loss(pred_outcomeTrain.reshape(-1), Y)
             num = pred_treatmentTrain.shape[0]
             target05 = [0.5 for _ in range(num)]
@@ -291,6 +299,8 @@ class Experiment():
             target = self.Tensor(np.random.uniform(low=0.0, high=1.0, size=num))
             d_zLoss = self.d_zLoss(pred_zTrain.reshape(-1), target)
             loss_train = pLoss + dLoss*self.alpha + d_zLoss*self.gamma
+            print("device: ",loss_train.device)
+            print("loss_train: ",loss_train)
             loss_train.backward()
             self.optimizerP.step()
 
@@ -298,7 +308,7 @@ class Experiment():
             self.model.zero_grad()
             self.model.train()
             self.optimizerB.zero_grad()
-            _, _,pred_outcomeTrain,rep,_ = self.model(A,X,T)
+            _, _,pred_outcomeTrain,rep,_ = self.model(edge_index,A,X,T,Z)
             pLoss = self.loss(pred_outcomeTrain.reshape(-1), Y)
             if self.args.model in set(["TARNet","TARNet_INTERFERENCE"]):
                 loss_train = pLoss
@@ -316,11 +326,11 @@ class Experiment():
         return loss_train,pLoss,dLoss,d_zLoss
         
         
-    def eval_one_step_encoder_predictor(self,A,X,T,Y):
+    def eval_one_step_encoder_predictor(self,edge_index,A,X,T,Z,Y):
 
         self.model.eval()
         if self.args.model == "NetEstimator":
-            pred_treatment, pred_z,pred_outcome,_,_ = self.model(A,X,T)
+            pred_treatment, pred_z,pred_outcome,_,_ = self.model(edge_index,A,X,T,Z)
             pLossV = self.loss(pred_outcome.reshape(-1), Y)
             num = pred_treatment.shape[0]
             target05 = [0.5 for _ in range(num)]
@@ -331,7 +341,7 @@ class Experiment():
             loss_val = pLossV+dLossV*self.alpha+d_zLossV*self.gamma
 
         else:
-            _, _,pred_outcome,rep,_ = self.model(A,X,T)
+            _, _,pred_outcome,rep,_ = self.model(edge_index,A,X,T)
             pLossV = self.loss(pred_outcome.reshape(-1), Y)
             if self.args.model in set(["TARNet","TARNet_INTERFERENCE"]):
                 loss_val = pLossV
@@ -348,9 +358,9 @@ class Experiment():
 
 
     
-    def compute_effect_pehe(self,A,X,gt_t1z1,gt_t1z0,gt_t0z7,gt_t0z2,gt_t0z0):
+    def compute_effect_pehe(self,edge_index,A,X,gt_t1z1,gt_t1z0,gt_t0z7,gt_t0z2,gt_t0z0):
         self.model_device = next(self.model.parameters()).device
-    
+        print("model device: ",self.model_device)    
         num = X.shape[0]
         z_1s = self.Tensor(np.ones(num)).to(self.model_device)
         z_0s = self.Tensor(np.zeros(num)).to(self.model_device)
@@ -359,11 +369,11 @@ class Experiment():
         t_1s = self.Tensor(np.ones(num)).to(self.model_device)
         t_0s = self.Tensor(np.zeros(num)).to(self.model_device)
 
-        _, _,pred_outcome_t1z1,_,_ = self.model(A,X,t_1s,z_1s)
-        _, _,pred_outcome_t1z0,_,_ = self.model(A,X,t_1s,z_0s)
-        _, _,pred_outcome_t0z0,_,_ = self.model(A,X,t_0s,z_0s)
-        _, _,pred_outcome_t0z7,_,_ = self.model(A,X,t_0s,z_07s)
-        _, _,pred_outcome_t0z2,_,_ = self.model(A,X,t_0s,z_02s)
+        _, _,pred_outcome_t1z1,_,_ = self.model(edge_index,A,X,t_1s,z_1s)
+        _, _,pred_outcome_t1z0,_,_ = self.model(edge_index,A,X,t_1s,z_0s)
+        _, _,pred_outcome_t0z0,_,_ = self.model(edge_index,A,X,t_0s,z_0s)
+        _, _,pred_outcome_t0z7,_,_ = self.model(edge_index,A,X,t_0s,z_07s)
+        _, _,pred_outcome_t0z2,_,_ = self.model(edge_index,A,X,t_0s,z_02s)
 
         pred_outcome_t1z1 = utils.PO_normalize_recover(self.args.normy,self.POTrain,pred_outcome_t1z1)
         pred_outcome_t1z0 = utils.PO_normalize_recover(self.args.normy,self.POTrain,pred_outcome_t1z0)
@@ -383,20 +393,20 @@ class Experiment():
         
         for _ in range(self.args.pstep):
 
-            loss_train,pLoss_train,dLoss_train,d_zLoss_train = self.train_one_step_encoder_predictor(self.trainA, self.trainX, self.trainT,self.YFTrain)
-            loss_val,pLoss_val,dLoss_val,d_zLoss_val = self.eval_one_step_encoder_predictor(self.valA, self.valX, self.valT,self.YFVal)
+            loss_train,pLoss_train,dLoss_train,d_zLoss_train = self.train_one_step_encoder_predictor(self.train_edge_index,self.trainA, self.trainX, self.trainT,self.trainZ,self.YFTrain)
+            loss_val,pLoss_val,dLoss_val,d_zLoss_val = self.eval_one_step_encoder_predictor(self.val_edge_index,self.valA, self.valX, self.valT,self.valZ,self.YFVal)
             self.lossTrain.append(loss_train.cpu().detach().numpy())
             self.lossVal.append(loss_val.cpu().detach().numpy())
            
             """CHECK CF"""
+            # if self.args.printPred:
+            # cfloss_train,cfPLoss_train,cfDLoss_train,cfD_zLoss_train = self.eval_one_step_encoder_predictor(self.trainA, self.trainX, self.cfTrainT,self.YCFTrain)
+            # cfloss_val,cfPLoss_val,cfDLoss_val,cfD_zLoss_val = self.eval_one_step_encoder_predictor(self.valA, self.valX, self.cfValT,self.YCFVal)
+            # self.lossCFTrain.append(cfloss_train.cpu().detach().numpy())
+            # self.lossCFVal.append(cfloss_val.cpu().detach().numpy())
 
-            cfloss_train,cfPLoss_train,cfDLoss_train,cfD_zLoss_train = self.eval_one_step_encoder_predictor(self.trainA, self.trainX, self.cfTrainT,self.YCFTrain)
-            cfloss_val,cfPLoss_val,cfDLoss_val,cfD_zLoss_val = self.eval_one_step_encoder_predictor(self.valA, self.valX, self.cfValT,self.YCFVal)
-            self.lossCFTrain.append(cfloss_train.cpu().detach().numpy())
-            self.lossCFVal.append(cfloss_val.cpu().detach().numpy())
-
-            individual_effect_train,peer_effect_train,total_effect_train = self.compute_effect_pehe(self.trainA, self.trainX,self.train_t1z1,self.train_t1z0,self.train_t0z7,self.train_t0z2,self.train_t0z0)
-            individual_effect_val,peer_effect_val,total_effect_val = self.compute_effect_pehe(self.valA, self.valX,self.val_t1z1,self.val_t1z0,self.val_t0z7,self.val_t0z2,self.val_t0z0)
+            # individual_effect_train,peer_effect_train,total_effect_train = self.compute_effect_pehe(self.trainA, self.trainX,self.train_t1z1,self.train_t1z0,self.train_t0z7,self.train_t0z2,self.train_t0z0)
+            # individual_effect_val,peer_effect_val,total_effect_val = self.compute_effect_pehe(self.valA, self.valX,self.val_t1z1,self.val_t1z0,self.val_t0z7,self.val_t0z2,self.val_t0z0)
         
 
         if self.args.printPred:
@@ -408,19 +418,19 @@ class Experiment():
                 'd_zLossTrain:{:.4f}'.format(d_zLoss_train.item()),
                 'd_zLossVal:{:.4f}'.format(d_zLoss_val.item()),
                 
-                'CFpLossTrain:{:.4f}'.format(cfPLoss_train.item()),
-                'CFpLossVal:{:.4f}'.format(cfPLoss_val.item()),
-                'CFdLossTrain:{:.4f}'.format(cfDLoss_train.item()),
-                'CFdLossVal:{:.4f}'.format(cfDLoss_val.item()),
-                'CFd_zLossTrain:{:.4f}'.format(cfD_zLoss_train.item()),
-                'CFd_zLossVal:{:.4f}'.format(cfD_zLoss_val.item()),
+                # 'CFpLossTrain:{:.4f}'.format(cfPLoss_train.item()),
+                # 'CFpLossVal:{:.4f}'.format(cfPLoss_val.item()),
+                # 'CFdLossTrain:{:.4f}'.format(cfDLoss_train.item()),
+                # 'CFdLossVal:{:.4f}'.format(cfDLoss_val.item()),
+                # 'CFd_zLossTrain:{:.4f}'.format(cfD_zLoss_train.item()),
+                # 'CFd_zLossVal:{:.4f}'.format(cfD_zLoss_val.item()),
 
-                'iE_train:{:.4f}'.format(individual_effect_train.item()),
-                'PE_train:{:.4f}'.format(peer_effect_train.item()),
-                'TE_train:{:.4f}'.format(total_effect_train.item()),
-                'iE_val:{:.4f}'.format(individual_effect_val.item()),
-                'PE_val:{:.4f}'.format(peer_effect_val.item()),
-                'TE_val:{:.4f}'.format(total_effect_val.item()),
+                # 'iE_train:{:.4f}'.format(individual_effect_train.item()),
+                # 'PE_train:{:.4f}'.format(peer_effect_train.item()),
+                # 'TE_train:{:.4f}'.format(total_effect_train.item()),
+                # 'iE_val:{:.4f}'.format(individual_effect_val.item()),
+                # 'PE_val:{:.4f}'.format(peer_effect_val.item()),
+                # 'TE_val:{:.4f}'.format(total_effect_val.item()),
 
                 )
 
@@ -441,9 +451,9 @@ class Experiment():
                 self.train_encoder_predictor(epoch)
     
 
-    def one_step_predict(self,A,X,T,Y):
+    def one_step_predict(self,edge_index,A,X,T,Y,Z=None):
         self.model.eval()
-        pred_treatment, _,pred_outcome,_,_ = self.model(A,X,T)
+        pred_treatment, _,pred_outcome,_,_ = self.model(edge_index,A,X,T)
         pred_outcome = utils.PO_normalize_recover(self.args.normy,self.POTrain,pred_outcome)
         Y = utils.PO_normalize_recover(self.args.normy,self.POTrain,Y)
         pLoss = self.loss(pred_outcome.reshape(-1), Y)
@@ -453,26 +463,62 @@ class Experiment():
 
     def predict(self):
         print ("================================Predicting================================")
-        self.model = self.model.to("cpu")
-        factualLossTrain,pred_train,YFTrainO = self.one_step_predict(self.trainA.cpu(),self.trainX.cpu(),self.trainT.cpu(),self.YFTrain.cpu())
-        factualLossVal,pred_val,YFValO = self.one_step_predict(self.valA.cpu(),self.valX.cpu(),self.valT.cpu(),self.YFVal.cpu())
-        factualLossTest,pred_test,YFTestO = self.one_step_predict(self.testA.cpu(),self.testX.cpu(),self.testT.cpu(),self.YFTest.cpu())
+        self.model = self.model.eval()
+        self.YFTrain = self.YFTrain.to(self.device)
+        self.YCFTrain = self.YCFTrain.to(self.device)
+        self.YFVal = self.YFVal.to(self.device)
+        self.YCFVal = self.YCFVal.to(self.device)
+        self.YFTest = self.YFTest.to(self.device)
+        self.YCFTest = self.YCFTest.to(self.device)
+        self.testT = self.testT.to(self.device)
+        self.testA = self.testA.to(self.device)
+        self.testX = self.testX.to(self.device)
+        self.cfTestT = self.cfTestT.to(self.device)
+        self.test_edge_index = self.test_edge_index.to(self.device)
 
-        cfLossTrain,cfPred_train,YCFTrainO = self.one_step_predict(self.trainA.cpu(),self.trainX.cpu(),self.cfTrainT.cpu(),self.YCFTrain.cpu())
-        cfLossVal,cfPred_val,YCFValO = self.one_step_predict(self.valA.cpu(),self.valX.cpu(),self.cfValT.cpu(),self.YCFVal.cpu())
-        cfLossTest,cfPred_test,YCFTestO = self.one_step_predict(self.testA.cpu(),self.testX.cpu(),self.cfTestT.cpu(),self.YCFTest.cpu())
+    
 
-        individual_effect_train,peer_effect_train,total_effect_train = self.compute_effect_pehe(self.trainA.cpu(), self.trainX.cpu(),self.train_t1z1.cpu(),self.train_t1z0.cpu(),self.train_t0z7.cpu(),self.train_t0z2.cpu(),self.train_t0z0.cpu())
-        individual_effect_val,peer_effect_val,total_effect_val = self.compute_effect_pehe(self.valA.cpu(), self.valX.cpu(),self.val_t1z1.cpu(),self.val_t1z0.cpu(),self.val_t0z7.cpu(),self.val_t0z2.cpu(),self.val_t0z0.cpu())
-        individual_effect_test,peer_effect_test,total_effect_test = self.compute_effect_pehe(self.testA.cpu(), self.testX.cpu(),self.test_t1z1.cpu(),self.test_t1z0.cpu(),self.test_t0z7.cpu(),self.test_t0z2.cpu(),self.test_t0z0.cpu())
+        factualLossTrain,pred_train,YFTrainO = self.one_step_predict(self.train_edge_index,self.trainA,self.trainX,self.trainT,self.YFTrain)
+        factualLossVal,pred_val,YFValO = self.one_step_predict(self.val_edge_index,self.valA,self.valX,self.valT,self.YFVal)
+        factualLossTest,pred_test,YFTestO = self.one_step_predict(self.test_edge_index,self.testA,self.testX,self.testT,self.YFTest)
+
+        # cfLossTrain,cfPred_train,YCFTrainO = self.one_step_predict(self.trainA.cpu(),self.trainX.cpu(),self.cfTrainT.cpu(),self.YCFTrain.cpu())
+        # cfLossVal,cfPred_val,YCFValO = self.one_step_predict(self.valA.cpu(),self.valX.cpu(),self.cfValT.cpu(),self.YCFVal.cpu())
+        # cfLossTest,cfPred_test,YCFTestO = self.one_step_predict(self.testA.cpu(),self.testX.cpu(),self.cfTestT.cpu(),self.YCFTest.cpu())
+        cfLossTrain,cfPred_train,YCFTrainO = self.one_step_predict(self.train_edge_index,self.trainA,self.trainX,self.cfTrainT,self.YCFTrain)
+        cfLossVal,cfPred_val,YCFValO = self.one_step_predict(self.val_edge_index,self.valA,self.valX,self.cfValT,self.YCFVal)
+        cfLossTest,cfPred_test,YCFTestO = self.one_step_predict(self.test_edge_index,self.testA,self.testX,self.cfTestT,self.YCFTest)
+        
+        self.train_t1z0 = self.train_t1z0.to(self.device)
+        self.train_t1z1 = self.train_t1z1.to(self.device)
+        self.train_t0z0 = self.train_t0z0.to(self.device)
+        self.train_t0z7 = self.train_t0z7.to(self.device)
+        self.train_t0z2 = self.train_t0z2.to(self.device)
+        self.val_t1z0 = self.val_t1z0.to(self.device)
+        self.val_t1z1 = self.val_t1z1.to(self.device)
+        self.val_t0z0 = self.val_t0z0.to(self.device)
+        self.val_t0z7 = self.val_t0z7.to(self.device)
+        self.val_t0z2 = self.val_t0z2.to(self.device)
+        self.test_t1z0 = self.test_t1z0.to(self.device)
+        self.test_t1z1 = self.test_t1z1.to(self.device)
+        self.test_t0z0 = self.test_t0z0.to(self.device)
+        self.test_t0z7 = self.test_t0z7.to(self.device)
+        self.test_t0z2 = self.test_t0z2.to(self.device)
+        individual_effect_train,peer_effect_train,total_effect_train = self.compute_effect_pehe(self.train_edge_index,self.trainA,self.trainX,self.train_t1z1,self.train_t1z0,self.train_t0z7,self.train_t0z2,self.train_t0z0)
+        individual_effect_val,peer_effect_val,total_effect_val = self.compute_effect_pehe(self.val_edge_index,self.valA,self.valX,self.val_t1z1,self.val_t1z0,self.val_t0z7,self.val_t0z2,self.val_t0z0)
+        individual_effect_test,peer_effect_test,total_effect_test = self.compute_effect_pehe(self.test_edge_index,self.testA,self.testX,self.test_t1z1,self.test_t1z0,self.test_t0z7,self.test_t0z2,self.test_t0z0)
+        
+        # individual_effect_train,peer_effect_train,total_effect_train = self.compute_effect_pehe(self.trainA.cpu(), self.trainX.cpu(),self.train_t1z1.cpu(),self.train_t1z0.cpu(),self.train_t0z7.cpu(),self.train_t0z2.cpu(),self.train_t0z0.cpu())
+        # individual_effect_val,peer_effect_val,total_effect_val = self.compute_effect_pehe(self.valA.cpu(), self.valX.cpu(),self.val_t1z1.cpu(),self.val_t1z0.cpu(),self.val_t0z7.cpu(),self.val_t0z2.cpu(),self.val_t0z0.cpu())
+        # individual_effect_test,peer_effect_test,total_effect_test = self.compute_effect_pehe(self.testA.cpu(), self.testX.cpu(),self.test_t1z1.cpu(),self.test_t1z0.cpu(),self.test_t0z7.cpu(),self.test_t0z2.cpu(),self.test_t0z0.cpu())
         
 
-        print('F_train:{:.4f}'.format(factualLossTrain.item()),
-              'F_val:{:.4f}'.format(factualLossVal.item()),
-              'F_test:{:.4f}'.format(factualLossTest.item()),
-              'CF_train:{:.4f}'.format(cfLossTrain.item()),
-              'CF_val:{:.4f}'.format(cfLossVal.item()),
-              'CF_test:{:.4f}'.format(cfLossTest.item()),
+        print('F_train:{:.4f}'.format(factualLossTrain.cpu().item()),
+              'F_val:{:.4f}'.format(factualLossVal.cpu().item()),
+              'F_test:{:.4f}'.format(factualLossTest.cpu().item()),
+              'CF_train:{:.4f}'.format(cfLossTrain.cpu().item()),
+              'CF_val:{:.4f}'.format(cfLossVal.cpu().item()),
+              'CF_test:{:.4f}'.format(cfLossTest.cpu().item()),
 
               'iE_train:{:.4f}'.format(individual_effect_train.item()),
               'PE_train:{:.4f}'.format(peer_effect_train.item()),

@@ -2,7 +2,9 @@ import numpy as np
 import networkx as nx
 import torch
 import pickle as pkl
+import os
 from src.data.datatools import *
+from src.data.node2vec import generate_node_embeddings
 
 
 
@@ -42,7 +44,7 @@ def potentialOutcomeSimulation(w,X,A,T,beta0, w_beta_T2Y, bias_T2Y,epsilon,betaT
     covariate2OutcomeMechanism = np.matmul(w,X.T) #X.T is transpose 
     neighbors = np.sum(A,1)
     neighborAverage = np.divide(np.matmul(A, covariate2OutcomeMechanism.reshape(-1)), neighbors)
-    beta_T2Y = np.matmul(w_beta_T2Y,X.T) + bias_T2Y #Voor nu enkel positieve waarden?
+    beta_T2Y = np.matmul(w_beta_T2Y,X.T) + bias_T2Y 
     print("beta_T2Y",beta_T2Y.mean(),beta_T2Y.std())
     if Z is None:
         neighborAverageT = np.divide(np.matmul(A, T.reshape(-1)), neighbors)
@@ -83,6 +85,12 @@ def generate_data(dataset,w_c,w, w_beta_T2Y,beta0, betaConfounding,betaNeighborC
             G = nx.barabasi_albert_graph(nodes, edges_new_node)
         print("avg_degree",sum(dict(G.degree()).values()) / len(G))
         adj_matrix = nx.adjacency_matrix(G)
+    elif dataset == "email-EU":
+        trainA, valA, testA =load_EU_network()
+    elif dataset == "enron":
+        trainA, valA, testA =load_enron_network()
+
+
     else:
         
         data,parts = readData(dataset)
@@ -96,6 +104,7 @@ def generate_data(dataset,w_c,w, w_beta_T2Y,beta0, betaConfounding,betaNeighborC
         testX = (testX-np.mean(testX,axis=0))/np.std(testX,axis=0)
         print("trainX",trainX)
         trainA, valA, testA = adjMatrixSplit(data,trainIndex,valIndex,testIndex,dataset)
+        
 
     # Convert the sparse matrix to a dense NumPy array
     if dataset == "full_sim":
@@ -120,6 +129,27 @@ def generate_data(dataset,w_c,w, w_beta_T2Y,beta0, betaConfounding,betaNeighborC
     if dataset == "full_sim":
 
         X = np.random.randn(dense_adj_matrix.shape[1], covariate_dim)
+    elif dataset == "email-EU":
+        file_path = "data/semi_synthetic/EU/EU_dim" + str(covariate_dim)+"_" + gen_type + "X.pkl"
+        if os.path.exists(file_path):
+            with open(file_path,"rb") as f:
+                X = pkl.load(f)
+        else:
+            print("generate embeddings")
+            X = generate_node_embeddings(dense_adj_matrix, covariate_dim)
+            with open(file_path,"wb") as f:
+                pkl.dump(X, f)
+    elif dataset == "enron":
+        file_path = "data/semi_synthetic/Enron/enron_dim" + str(covariate_dim)+"_" + gen_type + "X.pkl"
+        if os.path.exists(file_path):
+            with open(file_path,"rb") as f:
+                X = pkl.load(f)
+        else:
+            print("generate embeddings")
+            X = generate_node_embeddings(dense_adj_matrix, covariate_dim)
+            with open(file_path,"wb") as f:
+                pkl.dump(X, f)
+        
     else:
         if gen_type == "train":
             #column normalization --> calculate sd and mean for train and then use this also for test?! 

@@ -4,7 +4,8 @@ import pickle as pkl
 import torch.nn as nn
 import src.utils.utils as utils
 import numpy as np
-from src.methods.causal_models.modules import GCN, NN, Predictor,Discriminator
+from src.methods.causal_models.modules import GCN, NN, Predictor,Discriminator,GCNLayer
+from torch_geometric.nn import GCNConv
 import torch.nn as nn
 import torch.nn.functional as F
 """
@@ -42,7 +43,9 @@ class NetEstimator(nn.Module):
 
     def __init__(self,Xshape,hidden,dropout):
         super(NetEstimator, self).__init__()
-        self.encodergc = GCN(nfeat=Xshape, nclass=Xshape, dropout=dropout) #change back to nclass = Xshape, self.encodergc
+        #use GCNlAYER
+        self.encodergc = GCNLayer(Xshape, Xshape, dropout) #change back to nclass = Xshape, self.encodergc
+        # self.encodergc = GCN(nfeat=Xshape, nclass=Xshape, dropout=dropout) #change back to nclass = Xshape, self.encodergc
         self.encoder = NN(in_dim=Xshape+Xshape, out_dim=hidden)
         #self.encoder_final = NN(in_dim=hidden, out_dim=hidden)
         self.predictor = Predictor(input_size=hidden + 2, hidden_size1=hidden, hidden_size2=hidden,output_size=1)
@@ -50,9 +53,9 @@ class NetEstimator(nn.Module):
         self.discriminator_z = Discriminator(input_size=hidden+1,hidden_size1=hidden,hidden_size2=hidden,output_size=1)
     
 
-    def forward(self,A,X,T,Z=None):
+    def forward(self,edge_index,A,X,T,Z=None):
         #This was changed slightly compared to the original paper/code
-        embeddingsgc = self.encodergc(X,A)#self.encodergc(X, A) embeddingsgc
+        embeddingsgc = self.encodergc(X,edge_index)#self.encodergc(X, A) embeddingsgc
         embeddings = self.encoder(torch.cat((embeddingsgc, X), 1)) 
         #embeddings = self.encoder_final(embeddings)
         pred_treatment = self.discriminator(embeddings)

@@ -8,7 +8,7 @@ from src.methods.causal_models.baselineModels import GCN_DECONF,CFR,GCN_DECONF_I
 from src.methods.causal_models.model_training import Experiment
 import itertools
 
-def run_model(dataset,model,epochs,lr,setting, n_in = 1, n_out = 1):
+def run_model(dataset,model,epochs,lr, hidden,setting,n_in = 1, n_out = 1):
     """
     This is code from Song Jiang: https://github.com/songjiang0909/Causal-Inference-on-Networked-Data
     This code was ued in "Estimating causal effects on networked observational data":
@@ -81,7 +81,7 @@ def run_model(dataset,model,epochs,lr,setting, n_in = 1, n_out = 1):
     torch.manual_seed(args.seed)
     args.dataset = dataset
     args.model = model
-    args.hidden = 16
+    args.hidden = hidden
     args.alpha_base = 0
 
     trainA, trainX, trainT,cfTrainT,POTrain,cfPOTrain,valA, valX, valT,cfValT,POVal,cfPOVal,testA,testX, testT,cfTestT,POTest,cfPOTest,\
@@ -146,12 +146,14 @@ def train_best_models(dataset,setting,no_netest=False,no_CFR = False):
     :return: dict: best_config_CFR: best configuration for CFR
     :return: float: best_val_loss_CFR: validation loss for CFR
     """
-    hyperparameters_netest= {"epochs":[200,500,800], #200,500,1000
-                  "lr":[5e-3,1e-3,5e-4]}  #5e-3,1e-3,1e-4
-    hyperparameters_CFR = {"epochs":[500,800], #500,1000
-                  "lr":[5e-3,1e-3,5e-4],
-                  "n_in": [1,2],
-                  "n_out":[1,2]} #5e-3,1e-3,1e-4
+    hyperparameters_netest= {"epochs":[200], #200,500,800 
+                  "lr":[1e-3], #5e-3,1e-3,5e-4
+                  "hidden":[16]}  #8,16,32
+    hyperparameters_CFR = {"epochs":[500], #500,1000
+                  "lr":[1e-3], #5e-3,1e-3,5e-4
+                  "n_in": [2],
+                  "n_out":[2],
+                  "hidden":[16]} #5e-3,1e-3,1e-4
 
     keys = list(hyperparameters_netest.keys())
     values = list(hyperparameters_netest.values())
@@ -170,7 +172,8 @@ def train_best_models(dataset,setting,no_netest=False,no_CFR = False):
     for config in dict_combinations:
         epochs = config["epochs"]
         lr = config["lr"]
-        val_loss = run_model(dataset,"NetEstimator",epochs,lr,setting)
+        hidden = config["hidden"]
+        val_loss = run_model(dataset,"NetEstimator",epochs,lr,hidden,setting)
         if val_loss < best_val_loss_netest:
             best_val_loss_netest = val_loss
             best_config_netest = config
@@ -194,17 +197,18 @@ def train_best_models(dataset,setting,no_netest=False,no_CFR = False):
         lr = config["lr"]
         n_in = config["n_in"]
         n_out = config["n_out"]
+        hidden = config["hidden"]
         
-        val_loss = run_model(dataset,"CFR",epochs,lr,setting,n_in=n_in,n_out= n_out)
+        val_loss = run_model(dataset,"CFR",epochs,lr,hidden,setting,n_in=n_in,n_out= n_out)
         if val_loss < best_val_loss_CFR:
             best_val_loss_CFR = val_loss
             best_config_CFR = config
     
     # save models with best config
     
-    run_model(dataset,"NetEstimator",best_config_netest["epochs"],best_config_netest["lr"],setting)
+    run_model(dataset,"NetEstimator",best_config_netest["epochs"],best_config_netest["lr"],best_config_netest["hidden"],setting)
     
-    run_model(dataset,"CFR",best_config_CFR["epochs"],best_config_CFR["lr"],setting)
+    run_model(dataset,"CFR",best_config_CFR["epochs"],best_config_CFR["lr"],best_config_CFR["hidden"],setting,n_in=best_config_CFR["n_in"],n_out=best_config_CFR["n_out"])
     return best_config_netest,best_val_loss_netest,best_config_CFR,best_val_loss_CFR
     
     

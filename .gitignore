@@ -1,6 +1,9 @@
 figures/*
 data/semi_synthetic/BC/*
 data/semi_synthetic/Flickr/*
+data/semi_synthetic/Enron/*
+data/semi_synthetic/EU/*
+!data/semi_synthetic/Enron/__init__.py
 !data/semi_synthetic/BC/__init__.py
 !data/semi_synthetic/Flickr/__init__.py
 data/allocations/*
@@ -11,3 +14,7 @@ __pycache__/
 *.py[cod]
 scripts/main.py
 requirements_copy.txt
+allocations_VSC/*
+scripts/load_mtx.py
+scripts/metis.py
+scripts/time_plot.py

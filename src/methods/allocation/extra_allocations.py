@@ -1,7 +1,9 @@
 import torch
+from torch_geometric.utils import dense_to_sparse
 import src.utils.utils as utils
 import pickle as pkl
 from src.methods.allocation.utils.allocation_utils import *
+from src.methods.allocation.utils.Genetic_algorithm import run_GA
 def run_extra_allocations(dataset,T,do_GA,do_CELF,do_CFR,do_CFR_heuristic,do_greedy,do_random,do_greedy_simulated,
                     w_c,w, w_beta_T2Y,beta0, bias_T2Y, betaTreat2Outcome,betaCovariate2Outcome,betaNeighborCovariate2Outcome,
                     betaNeighborTreatment2Outcome, 
@@ -39,7 +41,8 @@ def run_extra_allocations(dataset,T,do_GA,do_CELF,do_CFR,do_CFR_heuristic,do_gre
     # trainA, trainX, trainT,cfTrainT,POTrain,cfPOTrain = utils.dataTransform(dataTrain,cuda)
     # valA, valX, valT,cfValT,POVal,cfPOVal = utils.dataTransform(dataVal,cuda)
     testA, testX, testT,cfTestT,POTest,cfPOTest = utils.dataTransform(dataTest,cuda)
-
+    test_edge_index = dense_to_sparse(testA)[0]
+    test_edge_index = test_edge_index.cuda()
     #Load in NetEst model and CFR
     model_netest_path = "models/"+setting+"/"+"NetEstimator" + "_"+ setting+".pth"
     model_CFR_path =  "models/"+setting+"/"+"CFR" + "_"+ setting+".pth"

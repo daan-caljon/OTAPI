@@ -1,12 +1,4 @@
-"""This code runs the allocations for beta_spillover (betaNeighborTreatment2Outcome) = 0.3
-Figures 10e and 10f are generated
-"""
-import torch
-print("torch version:", torch.__version__)
-print("CUDA available:", torch.cuda.is_available())
-print("CUDA version (compiled):", torch.version.cuda)
-print("Current device:", torch.cuda.current_device())
-print("Device name:", torch.cuda.get_device_name(0))
+
 
 # Allocate a large tensor to test memory handling
 # x = torch.rand((10000, 10000), device='cuda')
@@ -14,7 +6,7 @@ print("Device name:", torch.cuda.get_device_name(0))
 # stop
 import os
 import sys
-DIR = r"C:\Users\u0165132\OneDrive - KU Leuven\1-PhD\Causal-Inference-on-Networked-Data\OTAPI"
+DIR = r""
 os.chdir(DIR)
 sys.path.append(DIR)
 
@@ -29,22 +21,22 @@ import yaml
 
 
 #Set parameters for the simulation
-num_nodes = 5000 #does nothing when dataset is BC or Flickr
-dataset = "full_sim" #BC, Flickr, full_sim, email-EU
-# T = int(0.05*num_nodes) #number of treated nodes
-T = 10 #for testing purposes
+num_nodes = 11232 #does nothing when dataset is BC or Flickr 
+dataset = "enron" #BC, Flickr, full_sim, enron
+T = int(0.05*num_nodes) #number of treated nodes
+# T = 100 #for testing purposes
 do_greedy =  True 
 do_GA = True
-do_CELF = True
+do_CELF = False
 do_CFR = True #TARnet (alpha = 0)
 do_CFR_heuristic = False  #combine degree and uplift heuristic
 do_random = True
-do_greedy_simulated = True
+do_greedy_simulated = False
 do_full = False #turn this to true if going over all budgets
-do_only_allocations = False #if true, the data generation and training step are skipped
-do_only_graphs = False #if true allocations are skipped
+do_only_allocations = True #if true, the data generation and training step are skipped
+do_only_graphs = True #if true allocations are skipped
 get_degree_distribution = True #if true, degree distribution is plotted
-similarity_k = 250 #k for which the similarity matrix is generated
+similarity_k = 100 #k for which the similarity matrix is generated
 
 
 

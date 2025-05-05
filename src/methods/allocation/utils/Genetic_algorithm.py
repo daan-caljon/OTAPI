@@ -2,7 +2,9 @@ import time
 import numpy as np
 import pygad
 import torch
+from torch_geometric.utils import dense_to_sparse
 from src.methods.allocation.utils.allocation_utils import *
+
 
 
 
@@ -26,6 +28,8 @@ class GeneticAlgorithm():
         self.degree_solution = config["degree_solution"]
         self.single_discount_solution = config["single_discount_solution"]
         self.A = A
+
+        self.edge_index = dense_to_sparse(A)[0]
         self.model = model
         self.X = X
         self.POTrain= POTrain
@@ -56,7 +60,7 @@ class GeneticAlgorithm():
         if np.sum(solution) > self.T:
             return 0  
         #Calculate the fitness using causal model
-        my_fitness = get_sum_predicted_outcome(self.model,self.A.cuda(),self.X.cuda(),torch.Tensor(solution).cuda(),self.POTrain)
+        my_fitness = get_sum_predicted_outcome(self.model,self.edge_index.cuda(),self.A.cuda(),self.X.cuda(),torch.Tensor(solution).cuda(),self.POTrain)
 
         return my_fitness
 
@@ -96,4 +100,21 @@ def gen_init(A,T):
     indices = torch.randperm(length)[:T]
     random_tensor.view(-1)[indices] = 1
     return random_tensor
-        
+def run_GA(hyperparameter_defaults,data_params,X,edge_index,A,T,POTrain,model):
+    """Run the genetic algorithm for a given T
+    :param hyperparameter_defaults: dictionary with the hyperparameters of the genetic algorithm
+    :param data_params: dictionary with the parameters of the simulation
+    :param X: covariate matrix
+    :param T: number of treatments
+    :param A: adjacency matrix
+    :param PO: potential outcome
+    :param model: causal model
+    :return binary tensor with solution
+    :return predicted outcome of the solution (according to the given model)
+    :return actual outcome of the solution (according to the simulation)"""
+
+    GA = GeneticAlgorithm(model,A,X,POTrain,hyperparameter_defaults)
+    solution_ga, solution_fitness_ga = GA.run()
+    actual_outcome = get_sum_potential_outcome(data_params,X.cpu().numpy(),A.cpu().numpy(),solution_ga)
+    predicted_outcome = get_sum_predicted_outcome(model,edge_index,A,X,torch.Tensor(solution_ga),POTrain)
+    return solution_ga,predicted_outcome,actual_outcome
